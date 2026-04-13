@@ -130,7 +130,7 @@ export function QuizSection() {
   }, [category]);
 
   const startQuiz = useCallback(() => {
-    let pool = category === "Tous" ? [...ALL_QUESTIONS] : ALL_QUESTIONS.filter(q => q.category === category);
+    const pool = category === "Tous" ? [...ALL_QUESTIONS] : ALL_QUESTIONS.filter(q => q.category === category);
     // Shuffle
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));

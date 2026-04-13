@@ -247,7 +247,7 @@ export function TeamBuilderSection() {
   })();
 
   const problematicTypes = Object.entries(typeDefenseChart)
-    .filter(([_, stats]) => stats.weak >= 3)
+    .filter(([, stats]) => stats.weak >= 3)
     .map(([type]) => type);
 
   // Type Coverage Analysis
