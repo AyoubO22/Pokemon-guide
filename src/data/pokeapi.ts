@@ -6,7 +6,7 @@ let cache: Record<string, unknown> = {};
 try {
   const localCache = localStorage.getItem('pokeapi_cache');
   if (localCache) cache = JSON.parse(localCache);
-} catch (e) {
+} catch {
   // Ignore localStorage errors
 }
 
@@ -16,7 +16,7 @@ const saveCache = () => {
   } catch (e) {
     if (e instanceof DOMException && e.name === 'QuotaExceededError') {
       cache = {};
-      try { localStorage.removeItem('pokeapi_cache'); } catch (e2) {} // Ignore
+      try { localStorage.removeItem('pokeapi_cache'); } catch { /* ignore */ }
     }
   }
 };
