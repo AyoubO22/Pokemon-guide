@@ -23,7 +23,7 @@ const NAV_ITEMS = [
   { id: "items", label: "Objets", icon: "●" },
   { id: "status", label: "Statuts", icon: "◎" },
   { id: "moves", label: "Attaques", icon: "→" },
-  { id: "movedb", label: "Moves DB", icon: "⚡" },
+  { id: "movedb", label: "Moves DB", icon: "⊗" },
   { id: "mechanics", label: "Mécaniques", icon: "⚙" },
   { id: "pokedex", label: "Pokédex", icon: "◉" },
   { id: "team", label: "Teambuilding", icon: "◈" },
