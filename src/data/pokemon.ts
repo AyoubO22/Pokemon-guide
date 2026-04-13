@@ -184,8 +184,6 @@ export const TOP_POKEMON: CompetitivePokemon[] = [
     ],
     notes: "Le roi du VGC depuis Gen 7. Intimidate + Fake Out + Parting Shot = le meilleur package support du jeu en Doubles. Chaque année, les joueurs essaient de ne pas l'utiliser et finissent par le remettre."
   },
-];
-
   {
     name: "Tyranitar",
     types: ["Rock", "Dark"],
