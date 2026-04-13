@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { TypesSection } from './sections/TypesSection'
 import { StatsSection } from './sections/StatsSection'
 import { AbilitiesSection } from './sections/AbilitiesSection'
@@ -155,9 +156,9 @@ function App() {
             <div className={`relative ${theme === 'dark' ? 'bg-zinc-900' : 'bg-white'} border-b ${theme === 'dark' ? 'border-zinc-800' : 'border-zinc-200'} max-h-[70vh] overflow-y-auto`}>
               <div className="grid grid-cols-3 gap-1 p-3">
                 {NAV_ITEMS.map(item => (
-                  <TabsTrigger
+                  <button
                     key={item.id}
-                    value={item.id}
+                    onClick={() => { setActiveTab(item.id); setMobileMenuOpen(false); }}
                     className={`flex flex-col items-center gap-1 p-3 rounded-lg text-xs font-medium transition-colors
                       ${activeTab === item.id
                         ? 'bg-red-600 text-white'
@@ -166,7 +167,7 @@ function App() {
                   >
                     <span className="text-base">{item.icon}</span>
                     {item.label}
-                  </TabsTrigger>
+                  </button>
                 ))}
               </div>
             </div>
@@ -187,21 +188,21 @@ function App() {
 
         {/* Content */}
         <main className="px-3 sm:px-4 py-4 sm:py-6">
-          <TabsContent value="types"><TypesSection /></TabsContent>
-          <TabsContent value="stats"><StatsSection /></TabsContent>
-          <TabsContent value="abilities"><AbilitiesSection /></TabsContent>
-          <TabsContent value="items"><ItemsSection /></TabsContent>
-          <TabsContent value="status"><StatusSection /></TabsContent>
-          <TabsContent value="moves"><MovesSection /></TabsContent>
-          <TabsContent value="movedb"><MoveExplorerSection /></TabsContent>
-          <TabsContent value="mechanics"><MechanicsSection /></TabsContent>
-          <TabsContent value="pokedex"><PokedexSection /></TabsContent>
-          <TabsContent value="team"><TeamSection /></TabsContent>
-          <TabsContent value="builder"><TeamBuilderSection /></TabsContent>
-          <TabsContent value="calc"><DamageCalcSection /></TabsContent>
-          <TabsContent value="gens"><GenerationsSection /></TabsContent>
-          <TabsContent value="glossary"><GlossarySection /></TabsContent>
-          <TabsContent value="quiz"><QuizSection /></TabsContent>
+          <TabsContent value="types"><ErrorBoundary label="Types"><TypesSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="stats"><ErrorBoundary label="Stats"><StatsSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="abilities"><ErrorBoundary label="Talents"><AbilitiesSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="items"><ErrorBoundary label="Objets"><ItemsSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="status"><ErrorBoundary label="Statuts"><StatusSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="moves"><ErrorBoundary label="Attaques"><MovesSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="movedb"><ErrorBoundary label="Moves DB"><MoveExplorerSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="mechanics"><ErrorBoundary label="Mécaniques"><MechanicsSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="pokedex"><ErrorBoundary label="Pokédex"><PokedexSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="team"><ErrorBoundary label="Teambuilding"><TeamSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="builder"><ErrorBoundary label="Builder"><TeamBuilderSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="calc"><ErrorBoundary label="Calculateur"><DamageCalcSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="gens"><ErrorBoundary label="Générations"><GenerationsSection /></ErrorBoundary></TabsContent>
+          <TabsContent value="glossary"><ErrorBoundary label="Glossaire"><GlossarySection /></ErrorBoundary></TabsContent>
+          <TabsContent value="quiz"><ErrorBoundary label="Quiz"><QuizSection /></ErrorBoundary></TabsContent>
         </main>
       </Tabs>
 

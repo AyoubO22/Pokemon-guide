@@ -43,4 +43,20 @@ export const KEY_ABILITIES: Ability[] = [
   { name: "Slush Rush", nameFr: "Chasse-Neige", effect: "Double la Vitesse sous la grêle/neige.", tier: "B", category: "Météo" },
   { name: "Contrary", nameFr: "Contestation", effect: "Inverse les changements de stats. Leaf Storm = +2 Atq.Spé!", tier: "A", category: "Offensif" },
   { name: "Sheer Force", nameFr: "Sans Limite", effect: "+30% dégâts mais supprime les effets secondaires. Combo Life Orb.", tier: "A", category: "Offensif" },
+
+  // Gen 9 signature
+  { name: "Good as Gold", nameFr: "Corps en Or", effect: "Immunité totale aux moves de statut ciblés (Toxic, Will-O-Wisp, Taunt, Thunder Wave, etc.). Ne bloque PAS les entry hazards (Stealth Rock, Spikes) qui sont des effets de terrain.", tier: "S", category: "Défensif" },
+  { name: "Supreme Overlord", nameFr: "Commandant Suprême", effect: "+10% dégâts par allié KO (max +50%). Plus fort en fin de partie.", tier: "S", category: "Offensif" },
+  { name: "Protosynthesis", nameFr: "Protosynthèse", effect: "Boost la stat la plus haute de 30% (50% si Vitesse) sous le Soleil ou avec Booster Energy.", tier: "S", category: "Offensif" },
+  { name: "Quark Drive", nameFr: "Quark Drive", effect: "Boost la stat la plus haute de 30% (50% si Vitesse) sous Champ Électrifié ou avec Booster Energy.", tier: "S", category: "Offensif" },
+
+  // Additional competitive staples
+  { name: "Moxie", nameFr: "Impudence", effect: "+1 Attaque après chaque KO. Snowball physique, chaque KO rend le suivant plus facile.", tier: "A", category: "Offensif" },
+  { name: "Poison Heal", nameFr: "Soin Poison", effect: "Soigne 1/8 PV par tour si empoisonné au lieu de perdre des PV. Combo Toxic Orb.", tier: "S", category: "Défensif" },
+  { name: "Serene Grace", nameFr: "Sérénité", effect: "Double les taux d'effets secondaires. Air Slash 60% flinch, Iron Head 60% flinch.", tier: "A", category: "Offensif" },
+  { name: "Natural Cure", nameFr: "Médic Nature", effect: "Soigne tous les statuts en switchant. Parfait pour les pivots défensifs.", tier: "A", category: "Défensif" },
+  { name: "Beast Boost", nameFr: "Boost Chimère", effect: "+1 à la stat la plus haute après chaque KO. Version universelle de Moxie.", tier: "A", category: "Offensif" },
+  { name: "Tinted Lens", nameFr: "Lentille Teintée", effect: "Les attaques 'pas très efficaces' font des dégâts normaux. Élimine les résistances.", tier: "A", category: "Offensif" },
+  { name: "Unseen Fist", nameFr: "Poing Invisible", effect: "Les attaques de contact traversent Protect/Detect. Signature d'Urshifu.", tier: "S", category: "Offensif" },
+  { name: "Mirror Armor", nameFr: "Armure Miroir", effect: "Renvoie les baisses de stats à l'attaquant. Contre Intimidate, Sticky Web.", tier: "A", category: "Défensif" },
 ];

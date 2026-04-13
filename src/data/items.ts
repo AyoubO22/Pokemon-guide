@@ -39,4 +39,18 @@ export const COMPETITIVE_ITEMS: Item[] = [
   { name: "Terrain Extender", nameFr: "Prolongeur", effect: "Les terrains durent 8 tours au lieu de 5.", category: "Terrain", tier: "B" },
   { name: "Heat Rock", nameFr: "Roche Chaude", effect: "Le soleil dure 8 tours au lieu de 5.", category: "Météo", tier: "B" },
   { name: "Damp Rock", nameFr: "Roche Humide", effect: "La pluie dure 8 tours au lieu de 5.", category: "Météo", tier: "B" },
+
+  // Utility / Gen 9
+  { name: "Safety Goggles", nameFr: "Lunettes Filtre", effect: "Immunité aux attaques poudre (Spore, Sleep Powder) et aux dégâts météo.", category: "Défensif", tier: "A" },
+  { name: "Covert Cloak", nameFr: "Cape Furtive", effect: "Bloque les effets secondaires des attaques (flinch, stat drops, etc.). Gen 9.", category: "Défensif", tier: "A" },
+  { name: "Clear Amulet", nameFr: "Amulette Claire", effect: "Empêche les baisses de stats par l'adversaire. Bloque Intimidate. Gen 9.", category: "Défensif", tier: "A" },
+  { name: "Loaded Dice", nameFr: "Dé Pipé", effect: "Les attaques multi-hit frappent 4-5 fois au lieu de 2-5. Gen 9.", category: "Offensif", tier: "A" },
+  { name: "Mental Herb", nameFr: "Herbe Mental", effect: "Soigne Taunt, Encore, Disable, Torment (une fois). Crucial pour les setters TR/Tailwind.", category: "Support", tier: "A" },
+  { name: "Air Balloon", nameFr: "Ballon", effect: "Immunité au type Sol jusqu'au premier coup reçu. Élimine une faiblesse clé.", category: "Défensif", tier: "B" },
+  { name: "Red Card", nameFr: "Carton Rouge", effect: "Force l'adversaire à switch après avoir frappé (une fois). Disruption.", category: "Défensif", tier: "B" },
+  { name: "Shed Shell", nameFr: "Mue", effect: "Permet de switch même si piégé (Shadow Tag, Arena Trap, Magnet Pull).", category: "Défensif", tier: "B" },
+  { name: "Throat Spray", nameFr: "Spray Gorge", effect: "+1 Atq. Spé après utilisation d'une attaque sonore. Gen 8+.", category: "Offensif", tier: "B" },
+  { name: "Mirror Herb", nameFr: "Herbe Miroir", effect: "Copie les boosts de stats de l'adversaire (une fois). Gen 9.", category: "Support", tier: "B" },
+  { name: "White Herb", nameFr: "Herbe Blanche", effect: "Restaure les stats baissées une fois. Combo avec Shell Smash, Close Combat.", category: "Offensif", tier: "B" },
+  { name: "Black Sludge", nameFr: "Boue Noire", effect: "Soigne 1/16 PV/tour pour les Poison. Blesse les non-Poison. Leftovers des Poisons.", category: "Défensif", tier: "A" },
 ];
