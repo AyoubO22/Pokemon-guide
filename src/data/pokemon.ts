@@ -184,6 +184,146 @@ export const TOP_POKEMON: CompetitivePokemon[] = [
     ],
     notes: "Le roi du VGC depuis Gen 7. Intimidate + Fake Out + Parting Shot = le meilleur package support du jeu en Doubles. Chaque année, les joueurs essaient de ne pas l'utiliser et finissent par le remettre."
   },
+  {
+    name: "Tyranitar",
+    types: ["Rock", "Dark"],
+    baseStats: [100, 134, 110, 95, 100, 61],
+    tier: "OU (depuis Gen 2)",
+    role: ["Special Wall", "Wallbreaker", "Hazard Setter", "Weather Setter"],
+    keyAbilities: ["Sand Stream"],
+    keyMoves: ["Stone Edge", "Crunch", "Pursuit", "Stealth Rock", "Ice Punch", "Earthquake", "Dragon Dance", "Fire Punch"],
+    commonSets: [
+      { name: "Tank Spécial (Sable)", item: "Leftovers / Smooth Rock", ability: "Sand Stream", nature: "Careful", evs: "252 HP / 4 Atk / 252 SpD", moves: ["Stealth Rock", "Stone Edge", "Crunch", "Earthquake"], description: "Sand Stream booste sa Déf.Spé de 50% (type Roche). Avec invest SpD + sable, il tanke des Focus Blasts. Pose SR et met la pression." },
+      { name: "Dragon Dance", item: "Lum Berry / Life Orb", ability: "Sand Stream", nature: "Jolly", evs: "252 Atk / 4 SpD / 252 Spe", moves: ["Dragon Dance", "Stone Edge", "Crunch", "Ice Punch"], description: "Setup sweeper surprise. Après un DD, sa puissance brute est phénoménale. Lum Berry contre Will-O-Wisp." }
+    ],
+    notes: "Un des Pokémon les plus polyvalents de l'histoire. Sand Stream pose la tempête de sable automatiquement, ce qui boost sa Déf.Spé effective de 50%. Il peut jouer offensif, défensif ou support selon le set."
+  },
+  {
+    name: "Ferrothorn",
+    types: ["Grass", "Steel"],
+    baseStats: [74, 94, 131, 54, 116, 20],
+    tier: "OU (depuis Gen 5)",
+    role: ["Physical Wall", "Hazard Setter", "Entry Hazard Stack"],
+    keyAbilities: ["Iron Barbs"],
+    keyMoves: ["Stealth Rock", "Spikes", "Leech Seed", "Power Whip", "Knock Off", "Gyro Ball", "Thunder Wave", "Protect"],
+    commonSets: [
+      { name: "Hazard Setter", item: "Leftovers / Rocky Helmet", ability: "Iron Barbs", nature: "Relaxed", evs: "252 HP / 252 Def / 4 SpD", moves: ["Stealth Rock", "Spikes", "Leech Seed", "Power Whip"], description: "Le meilleur poseur de hazards. SR + Spikes en un seul Pokémon. Iron Barbs + Rocky Helmet = 29% de dégâts à chaque contact. Leech Seed pour du recovery passif." },
+      { name: "Specially Defensive", item: "Leftovers", ability: "Iron Barbs", nature: "Sassy", evs: "252 HP / 4 Def / 252 SpD", moves: ["Spikes", "Leech Seed", "Knock Off", "Protect"], description: "Invest SpD pour tanker les Water-types et Electric-types. Knock Off retire les objets adverses. Protect scoute et gagne du Leech Seed healing." }
+    ],
+    notes: "Plante/Acier est un des meilleurs typings défensifs : 9 résistances + immunité Poison. Sa lenteur extrême (20 Spe) est un avantage sous Trick Room ou avec Gyro Ball. Vulnérable au Feu x4 mais tout le reste galère à le tuer."
+  },
+  {
+    name: "Corviknight",
+    types: ["Flying", "Steel"],
+    baseStats: [98, 87, 105, 53, 85, 67],
+    tier: "OU (Gen 8-9)",
+    role: ["Physical Wall", "Hazard Removal", "Pivot"],
+    keyAbilities: ["Pressure", "Mirror Armor"],
+    keyMoves: ["Roost", "Defog", "U-turn", "Body Press", "Brave Bird", "Iron Head", "Bulk Up"],
+    commonSets: [
+      { name: "Défog Pivot", item: "Rocky Helmet / Leftovers", ability: "Pressure", nature: "Impish", evs: "252 HP / 252 Def / 4 SpD", moves: ["Roost", "Defog", "U-turn", "Body Press"], description: "Le mur physique + hazard removal parfait. Roost pour la longévité, Defog retire les hazards, U-turn maintient le momentum, Body Press utilise sa Défense élevée." },
+      { name: "Bulk Up", item: "Leftovers", ability: "Mirror Armor", nature: "Impish", evs: "252 HP / 252 Def / 4 SpD", moves: ["Bulk Up", "Body Press", "Roost", "Iron Head"], description: "Setup défensif. Bulk Up boost Atk et Def. Body Press scale avec la Défense boostée. Mirror Armor renvoie les baisses de stats (Intimidate!)." }
+    ],
+    notes: "Le successeur spirituel de Skarmory. Vol/Acier = excellent typing défensif. Seules faiblesses : Feu et Électrik. Il peut Defog, pivot avec U-turn, tanker indéfiniment avec Roost. Un must en balanced."
+  },
+  {
+    name: "Weavile",
+    types: ["Dark", "Ice"],
+    baseStats: [70, 120, 65, 45, 85, 125],
+    tier: "OU",
+    role: ["Revenge Killer", "Wallbreaker", "Pursuit Trapper"],
+    keyAbilities: ["Pressure"],
+    keyMoves: ["Triple Axel", "Knock Off", "Ice Shard", "Low Kick", "Swords Dance", "Ice Punch", "Pursuit"],
+    commonSets: [
+      { name: "Swords Dance", item: "Heavy-Duty Boots / Life Orb", ability: "Pressure", nature: "Jolly", evs: "252 Atk / 4 SpD / 252 Spe", moves: ["Swords Dance", "Triple Axel", "Knock Off", "Ice Shard"], description: "Setup rapide. Base 125 Spe signifie qu'il outspeed presque tout sans Scarf. Knock Off est la meilleure utility move. Ice Shard finit les affaiblis." },
+      { name: "Choice Band", item: "Choice Band", ability: "Pressure", nature: "Jolly", evs: "252 Atk / 4 SpD / 252 Spe", moves: ["Triple Axel", "Knock Off", "Low Kick", "Ice Shard"], description: "Puissance immédiate. Band Knock Off fait mal à tout ce qui switch in. Triple Axel touche les Grass, Dragon, Ground, Flying." }
+    ],
+    notes: "L'un des meilleurs revenge killers du jeu. 125 Spe + Knock Off + Ice Shard couvre tout. Glace/Ténèbres est offensivement excellent mais défensivement fragile. Joue avec les Heavy-Duty Boots pour éviter le chip damage de Stealth Rock."
+  },
+  {
+    name: "Volcarona",
+    types: ["Bug", "Fire"],
+    baseStats: [85, 60, 65, 135, 105, 100],
+    tier: "OU",
+    role: ["Special Sweeper", "Setup Sweeper", "Late-Game Cleaner"],
+    keyAbilities: ["Flame Body"],
+    keyMoves: ["Quiver Dance", "Flamethrower", "Bug Buzz", "Giga Drain", "Psychic", "Roost", "Hurricane"],
+    commonSets: [
+      { name: "Quiver Dance", item: "Heavy-Duty Boots", ability: "Flame Body", nature: "Timid", evs: "252 SpA / 4 SpD / 252 Spe", moves: ["Quiver Dance", "Flamethrower", "Bug Buzz", "Giga Drain"], description: "Le sweeper spécial ultime. Quiver Dance boost SpA, SpD ET Spe. Après un QD, quasi rien ne peut le revenge kill ou le tanker. Heavy-Duty Boots OBLIGATOIRE (x4 faiblesse Rock = 50% de SR)." },
+      { name: "Bulky QD", item: "Heavy-Duty Boots", ability: "Flame Body", nature: "Timid", evs: "252 HP / 160 SpA / 96 Spe", moves: ["Quiver Dance", "Flamethrower", "Giga Drain", "Roost"], description: "Version plus tanky. Roost + QD SpD boost = très difficile à tuer côté spécial. Giga Drain soigne en attaquant." }
+    ],
+    notes: "Quiver Dance est le meilleur move de setup spécial et Volcarona est son meilleur utilisateur. Son SEUL problème : x4 faiblesse Stealth Rock (perd 50% PV en entrant). Heavy-Duty Boots est non-négociable. Si les hazards sont retirés, Volcarona sweep des parties entières."
+  },
+  {
+    name: "Scizor",
+    types: ["Bug", "Steel"],
+    baseStats: [70, 130, 100, 55, 80, 65],
+    tier: "OU (depuis Gen 2)",
+    role: ["Priority Attacker", "Pivot", "Revenge Killer", "Setup Sweeper"],
+    keyAbilities: ["Technician"],
+    keyMoves: ["Bullet Punch", "U-turn", "Swords Dance", "Knock Off", "Superpower", "Roost", "Defog"],
+    commonSets: [
+      { name: "Swords Dance + Priority", item: "Life Orb / Leftovers", ability: "Technician", nature: "Adamant", evs: "252 HP / 252 Atk / 4 SpD", moves: ["Swords Dance", "Bullet Punch", "Knock Off", "Superpower"], description: "+2 Bullet Punch avec Technician + STAB = puissance monstrueuse avec priorité +1. Touche presque tout de manière neutre entre Steel/Dark/Fighting." },
+      { name: "Pivot Défensif", item: "Heavy-Duty Boots / Rocky Helmet", ability: "Technician", nature: "Impish", evs: "252 HP / 252 Def / 4 SpD", moves: ["U-turn", "Bullet Punch", "Knock Off", "Roost"], description: "U-turn pivot avec d'excellentes résistances. Roost assure la longévité. Bullet Punch revenge kill en urgence." }
+    ],
+    notes: "Technician Bullet Punch est iconique : 40 puissance base devient 90 (Technician x1.5, STAB x1.5) avec priorité +1. Bug/Acier n'a qu'une seule faiblesse (Feu x4) mais 8 résistances + immunité Poison. Le pivot offensif par excellence depuis 20 ans."
+  },
+  {
+    name: "Rotom-Wash",
+    types: ["Electric", "Water"],
+    baseStats: [50, 65, 107, 105, 107, 86],
+    tier: "OU (depuis Gen 4)",
+    role: ["Pivot", "Special Wall", "Utility"],
+    keyAbilities: ["Levitate"],
+    keyMoves: ["Volt Switch", "Hydro Pump", "Will-O-Wisp", "Pain Split", "Trick", "Thunder Wave", "Defog"],
+    commonSets: [
+      { name: "Pivot Défensif", item: "Leftovers", ability: "Levitate", nature: "Bold", evs: "252 HP / 252 Def / 4 SpA", moves: ["Volt Switch", "Hydro Pump", "Will-O-Wisp", "Pain Split"], description: "Le pivot ultime. Eau/Électrik + Lévitation = UNE seule faiblesse (Plante). Volt Switch maintient le momentum, Will-O-Wisp stoppe les physiques, Pain Split soigne." },
+      { name: "Choice Specs", item: "Choice Specs", ability: "Levitate", nature: "Modest", evs: "252 SpA / 4 SpD / 252 Spe", moves: ["Volt Switch", "Hydro Pump", "Thunderbolt", "Trick"], description: "Offensif surprise. Specs Hydro Pump fait très mal. Trick donne les Specs à un wall pour le cripple." }
+    ],
+    notes: "Eau + Électrik + Lévitation donne une seule faiblesse : Plante. C'est le defensive typing le plus efficient du jeu. Volt Switch en fait un excellent pivot. Peut burn, pivot, et tanker. Le Pokémon 'glue' par excellence."
+  },
+  {
+    name: "Blissey",
+    types: ["Normal"],
+    baseStats: [255, 10, 10, 75, 135, 55],
+    tier: "OU",
+    role: ["Special Wall", "Cleric", "Wish Passer"],
+    keyAbilities: ["Natural Cure"],
+    keyMoves: ["Soft-Boiled", "Toxic", "Seismic Toss", "Stealth Rock", "Thunder Wave", "Heal Bell", "Wish", "Teleport"],
+    commonSets: [
+      { name: "Mur Spécial", item: "Heavy-Duty Boots", ability: "Natural Cure", nature: "Bold", evs: "252 HP / 252 Def / 4 SpD", moves: ["Soft-Boiled", "Seismic Toss", "Toxic", "Stealth Rock"], description: "Le mur spécial absolu. 255 PV + 135 Déf.Spé = RIEN de spécial ne passe. Seismic Toss inflige toujours 100 dégâts fixes. Toxic pressure les switchs." },
+      { name: "Wish Support", item: "Heavy-Duty Boots", ability: "Natural Cure", nature: "Bold", evs: "252 HP / 252 Def / 4 SpD", moves: ["Wish", "Protect", "Seismic Toss", "Heal Bell"], description: "Wish passe des PV énormes aux partenaires (base 255 PV!). Heal Bell soigne les statuts de toute l'équipe. Le cleric parfait." }
+    ],
+    notes: "Le mur spécial le plus célèbre du jeu. 255 PV de base est absurde. Aucun sweeper spécial ne peut la passer. Sa faiblesse : 10 de Défense physique, donc tout Close Combat la détruit. Natural Cure soigne les statuts en switchant."
+  },
+  {
+    name: "Urshifu-Rapid-Strike",
+    types: ["Water", "Fighting"],
+    baseStats: [100, 130, 100, 63, 60, 97],
+    tier: "OU (Gen 8-9)",
+    role: ["Wallbreaker", "Pivot"],
+    keyAbilities: ["Unseen Fist"],
+    keyMoves: ["Surging Strikes", "Close Combat", "U-turn", "Aqua Jet", "Ice Punch", "Thunder Punch"],
+    commonSets: [
+      { name: "Choice Band", item: "Choice Band", ability: "Unseen Fist", nature: "Jolly", evs: "252 Atk / 4 SpD / 252 Spe", moves: ["Surging Strikes", "Close Combat", "U-turn", "Aqua Jet"], description: "Surging Strikes frappe 3 fois = ignore Substitute, Focus Sash ET crit garanti chaque coup (ignore les boosts défensifs). Band Surging Strikes détruit quasi tout." },
+      { name: "Swords Dance", item: "Mystic Water / Life Orb", ability: "Unseen Fist", nature: "Jolly", evs: "252 Atk / 4 SpD / 252 Spe", moves: ["Swords Dance", "Surging Strikes", "Close Combat", "Aqua Jet"], description: "Setup puis sweep. +2 Surging Strikes est inarrêtable. Aqua Jet en priorité pour finir." }
+    ],
+    notes: "Surging Strikes est la meilleure attaque physique du jeu : multi-hit (passe Sub/Sash), crit garanti (ignore les boosts défensifs). Unseen Fist touche à travers Protect. C'est le wallbreaker ultime, rien ne peut wall de manière fiable."
+  },
+  {
+    name: "Gliscor",
+    types: ["Ground", "Flying"],
+    baseStats: [75, 95, 125, 45, 75, 95],
+    tier: "OU",
+    role: ["Physical Wall", "Stall", "Toxic Staller"],
+    keyAbilities: ["Poison Heal"],
+    keyMoves: ["Earthquake", "Toxic", "Protect", "Substitute", "Knock Off", "Stealth Rock", "U-turn", "Swords Dance"],
+    commonSets: [
+      { name: "SubToxic Stall", item: "Toxic Orb", ability: "Poison Heal", nature: "Impish", evs: "244 HP / 204 Def / 60 Spe", moves: ["Substitute", "Toxic", "Earthquake", "Protect"], description: "Le set signature. Toxic Orb active Poison Heal (12.5% PV/tour). Substitute + Protect = régénère plus qu'il ne perd. Toxic l'adversaire et attend qu'il meurt. Insupportable." },
+      { name: "Swords Dance", item: "Toxic Orb", ability: "Poison Heal", nature: "Jolly", evs: "252 Atk / 4 Def / 252 Spe", moves: ["Swords Dance", "Earthquake", "Knock Off", "Ice Fang"], description: "Version offensive. Poison Heal soigne passivement pendant qu'il setup. Earthquake STAB + Knock Off coverage. Surprend les teams qui attendent le stall set." }
+    ],
+    notes: "Poison Heal + Toxic Orb = 12.5% PV récupérés par tour, immunité à tous les autres statuts, et pas de chip damage de poison. C'est le meilleur recovery passif du jeu. Sol/Vol est un excellent typing défensif. Le cauchemar des équipes sans wallbreaker spécial."
+  },
 ];
 
 export const STAT_LABELS = ["PV", "Atq", "Déf", "A.Sp", "D.Sp", "Vit"];

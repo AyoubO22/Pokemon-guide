@@ -75,4 +75,30 @@ export const MOVE_CATEGORIES: MoveCategory[] = [
       { name: "Teleport", nameFr: "Téléport", type: "Psychic", category: "Status", power: null, accuracy: null, pp: 20, effect: "-6 priorité, switch. Le Pokémon entrant arrive sans prendre de dégâts.", competitiveNotes: "Le slow pivot parfait. Fait entrer un allié en sécurité. Clefable, Slowbro." },
     ]
   },
+  {
+    name: "Key Coverage Moves", nameFr: "Attaques de Couverture",
+    description: "Les attaques offensives les plus importantes en compétitif. Elles complètent les STAB et touchent ce que les types principaux ne couvrent pas.",
+    moves: [
+      { name: "Knock Off", nameFr: "Sabotage", type: "Dark", category: "Physical", power: 65, accuracy: 100, pp: 20, effect: "Retire l'objet adverse. +50% dégâts si l'adversaire tient un objet (97.5 puissance effective).", competitiveNotes: "La meilleure utility move du jeu. Retirer un objet est dévastateur (pas de Leftovers recovery, pas d'Eviolite bulk). Quasi tous les Pokémon physiques la veulent." },
+      { name: "Close Combat", nameFr: "Close Combat", type: "Fighting", category: "Physical", power: 120, accuracy: 100, pp: 5, effect: "-1 Déf, -1 Déf.Spé après utilisation.", competitiveNotes: "La meilleure attaque physique Combat. 120 puissance sans restriction (contrairement aux Choice). Le drawback est acceptable car tu veux KO, pas tanker." },
+      { name: "Flamethrower", nameFr: "Lance-Flammes", type: "Fire", category: "Special", power: 90, accuracy: 100, pp: 15, effect: "10% chance de brûlure.", competitiveNotes: "Coverage Feu fiable. Touche les Acier et Plante qui wall beaucoup de types. Préféré à Fire Blast pour la fiabilité (100% vs 85%)." },
+      { name: "Ice Beam", nameFr: "Laser Glace", type: "Ice", category: "Special", power: 90, accuracy: 100, pp: 10, effect: "10% chance de gel.", competitiveNotes: "Coverage Glace essentielle. Touche Dragon, Sol, Vol, Plante — les types les plus communs en OU. BoltBeam (Thunderbolt + Ice Beam) est le combo coverage classique." },
+      { name: "Thunderbolt", nameFr: "Tonnerre", type: "Electric", category: "Special", power: 90, accuracy: 100, pp: 15, effect: "10% chance de paralysie.", competitiveNotes: "Coverage Électrik standard. Touche Eau et Vol. Combo BoltBeam avec Ice Beam pour une couverture quasi parfaite." },
+      { name: "Earthquake", nameFr: "Séisme", type: "Ground", category: "Physical", power: 100, accuracy: 100, pp: 10, effect: "Touche tous les Pokémon adjacents en Doubles.", competitiveNotes: "La meilleure attaque physique non-restrictive. 100 puissance, 100 précision, aucun drawback. Sol est le meilleur type offensif. Attention en Doubles : touche aussi l'allié!" },
+      { name: "Stone Edge", nameFr: "Lame de Roc", type: "Rock", category: "Physical", power: 100, accuracy: 80, pp: 5, effect: "Taux de critique élevé.", competitiveNotes: "Le EdgeQuake combo (Stone Edge + Earthquake) a une couverture quasi parfaite. Son problème : 80% précision = miss crucial. Rock Slide préféré en Doubles (spread + flinch)." },
+    ]
+  },
+  {
+    name: "Key Status Moves", nameFr: "Attaques de Statut Clés",
+    description: "Les attaques de statut qui définissent le metagame compétitif. Elles ne font pas de dégâts mais changent le cours du match.",
+    moves: [
+      { name: "Toxic", nameFr: "Toxik", type: "Poison", category: "Status", power: null, accuracy: 90, pp: 10, effect: "Empoisonnement grave : dégâts augmentent chaque tour (1/16, 2/16, 3/16...).", competitiveNotes: "La meilleure pression à long terme. Force les switchs car rester = mourir. Essentiel en stall. Les Poison types ont 100% précision." },
+      { name: "Will-O-Wisp", nameFr: "Feu Follet", type: "Fire", category: "Status", power: null, accuracy: 85, pp: 15, effect: "Brûle la cible. -50% Attaque physique + dégâts 1/16/tour.", competitiveNotes: "Le meilleur counter aux attaquants physiques. Un Garchomp brûlé est quasi inutile. 85% précision est le seul défaut." },
+      { name: "Thunder Wave", nameFr: "Cage Éclair", type: "Electric", category: "Status", power: null, accuracy: 90, pp: 20, effect: "Paralyse la cible. -50% Vitesse + 25% chance de ne pas agir.", competitiveNotes: "Speed control permanent. Transforme les sweepers rapides en cibles lentes. Ne touche pas les types Sol." },
+      { name: "Taunt", nameFr: "Provoc", type: "Dark", category: "Status", power: null, accuracy: 100, pp: 20, effect: "Empêche les attaques de statut pendant 3 tours.", competitiveNotes: "Détruit les walls (pas de Recover, Toxic, Stealth Rock). Essentiel en lead pour empêcher les hazards adverses. 100% précision." },
+      { name: "Roost", nameFr: "Atterrissage", type: "Flying", category: "Status", power: null, accuracy: null, pp: 5, effect: "Soigne 50% PV max. Perd le type Vol ce tour.", competitiveNotes: "Le recovery des oiseaux. Permet aux Pokémon Vol de tanker indéfiniment. Perdre le type Vol un tour peut être un avantage (pas de faiblesse Glace/Électrik ce tour)." },
+      { name: "Recover", nameFr: "Soin", type: "Normal", category: "Status", power: null, accuracy: null, pp: 5, effect: "Soigne 50% PV max.", competitiveNotes: "Recovery fiable sans contrepartie. Souvent la différence entre un bon wall et un excellent wall." },
+      { name: "Wish", nameFr: "Voeu", type: "Normal", category: "Status", power: null, accuracy: null, pp: 10, effect: "Soigne 50% PV max du Pokémon en jeu au tour suivant.", competitiveNotes: "Peut soigner un partenaire en switchant! Le montant est basé sur les PV du lanceur — Blissey (255 PV) passe des Wish énormes à ses alliés." },
+    ]
+  },
 ];
