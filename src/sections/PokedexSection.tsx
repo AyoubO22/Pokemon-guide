@@ -680,12 +680,19 @@ export function PokedexSection() {
 
                 {curatedPkm.commonSets.map(set => (
                   <div key={set.name} className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-                    <h5 className="font-semibold text-sm text-red-400 mb-2">{set.name}</h5>
+                    <div className="flex items-center gap-2 mb-2">
+                      <h5 className="font-semibold text-sm text-red-400">{set.name}</h5>
+                      {set.format && (
+                        <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${set.format === 'VGC' ? 'bg-purple-900/50 text-purple-300' : 'bg-blue-900/50 text-blue-300'}`}>
+                          {set.format}
+                        </span>
+                      )}
+                    </div>
                     <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
-                      <div className="bg-zinc-800/50 rounded p-2"><span className="text-zinc-500">Objet:</span> <span className="text-zinc-200">{set.item}</span></div>
-                      <div className="bg-zinc-800/50 rounded p-2"><span className="text-zinc-500">Talent:</span> <span className="text-zinc-200">{set.ability}</span></div>
-                      <div className="bg-zinc-800/50 rounded p-2"><span className="text-zinc-500">Nature:</span> <span className="text-zinc-200">{set.nature}</span></div>
-                      <div className="bg-zinc-800/50 rounded p-2"><span className="text-zinc-500">EVs:</span> <span className="text-zinc-200">{set.evs}</span></div>
+                      <div className="bg-zinc-800/80 rounded p-2 border-l-2 border-l-yellow-500"><span className="text-zinc-500">Objet:</span> <span className="text-yellow-400 font-medium ml-1">{set.item}</span></div>
+                      <div className="bg-zinc-800/50 rounded p-2"><span className="text-zinc-500">Talent:</span> <span className="text-zinc-200 ml-1">{set.ability}</span></div>
+                      <div className="bg-zinc-800/50 rounded p-2"><span className="text-zinc-500">Nature:</span> <span className="text-zinc-200 ml-1">{set.nature}</span></div>
+                      <div className="bg-zinc-800/50 rounded p-2"><span className="text-zinc-500">EVs:</span> <span className="text-zinc-200 ml-1">{set.evs}</span></div>
                     </div>
                     <div className="flex flex-wrap gap-1 mb-3">
                       {set.moves.map(m => <span key={m} className="text-xs bg-zinc-800 text-zinc-300 px-2 py-1 rounded font-medium">{m}</span>)}

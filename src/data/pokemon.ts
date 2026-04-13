@@ -19,6 +19,7 @@ export interface PokemonSet {
   evs: string;
   moves: string[];
   description: string;
+  format?: "VGC" | "Smogon OU" | "Any";
 }
 
 export const TOP_POKEMON: CompetitivePokemon[] = [
@@ -180,7 +181,7 @@ export const TOP_POKEMON: CompetitivePokemon[] = [
     keyAbilities: ["Intimidate"],
     keyMoves: ["Fake Out", "Flare Blitz", "Knock Off", "U-turn", "Parting Shot", "Will-O-Wisp", "Snarl"],
     commonSets: [
-      { name: "VGC Support", item: "Safety Goggles / Sitrus Berry", ability: "Intimidate", nature: "Careful", evs: "252 HP / 12 Atk / 116 Def / 4 SpD / 124 Spe", moves: ["Fake Out", "Knock Off", "Flare Blitz", "Parting Shot"], description: "LE Pokémon #1 du VGC. Fake Out Turn 1, Intimidate baisse l'Atk adverse, Parting Shot = pivot + baisse stats, Knock Off retire les objets. Le couteau suisse ultime." }
+      { name: "VGC Support", item: "Safety Goggles / Sitrus Berry", ability: "Intimidate", nature: "Careful", evs: "252 HP / 12 Atk / 116 Def / 4 SpD / 124 Spe", moves: ["Fake Out", "Knock Off", "Flare Blitz", "Parting Shot"], description: "LE Pokémon #1 du VGC. Fake Out Turn 1, Intimidate baisse l'Atk adverse, Parting Shot = pivot + baisse stats, Knock Off retire les objets. Le couteau suisse ultime.", format: "VGC" }
     ],
     notes: "Le roi du VGC depuis Gen 7. Intimidate + Fake Out + Parting Shot = le meilleur package support du jeu en Doubles. Chaque année, les joueurs essaient de ne pas l'utiliser et finissent par le remettre."
   },
@@ -296,6 +297,72 @@ export const TOP_POKEMON: CompetitivePokemon[] = [
     ],
     notes: "Le mur spécial ultime depuis Gen 2. 255 PV est le maximum absolu. Natural Cure soigne les statuts en switchant. Seismic Toss est son STAB de fait (100 dégâts fixes). Wish passé aux alliés = support incomparable."
   },
+  {
+    name: "Amoonguss",
+    types: ["Grass", "Poison"],
+    baseStats: [114, 85, 70, 85, 80, 30],
+    tier: "VGC dominant / OU",
+    role: ["Support", "Redirector", "Pivot"],
+    keyAbilities: ["Regenerator"],
+    keyMoves: ["Spore", "Rage Powder", "Pollen Puff", "Protect", "Clear Smog", "Sludge Bomb"],
+    commonSets: [
+      { name: "Support VGC", item: "Rocky Helmet / Sitrus Berry", ability: "Regenerator", nature: "Relaxed", evs: "252 HP / 156 Def / 100 SpD", moves: ["Spore", "Rage Powder", "Pollen Puff", "Protect"], description: "Le redirector par excellence. Rage Powder attire les attaques, Spore endort (100% prio), Pollen Puff soigne les alliés. Un monstre en Doubles.", format: "VGC" }
+    ],
+    notes: "Amoonguss est l'un des meilleurs Pokémon de support de tous les temps en VGC. Sa lenteur est parfaite pour Trick Room."
+  },
+  {
+    name: "Rillaboom",
+    types: ["Grass"],
+    baseStats: [100, 125, 90, 60, 70, 85],
+    tier: "VGC / OU",
+    role: ["Priority Attacker", "Terrain Setter", "Pivot"],
+    keyAbilities: ["Grassy Surge"],
+    keyMoves: ["Grassy Glide", "Wood Hammer", "U-turn", "Fake Out", "Knock Off"],
+    commonSets: [
+      { name: "Pivot Offensif VGC", item: "Assault Vest", ability: "Grassy Surge", nature: "Adamant", evs: "252 HP / 252 Atk / 4 SpD", moves: ["Fake Out", "Grassy Glide", "U-turn", "Wood Hammer"], description: "Pose le Grassy Terrain, tape à priorité avec Grassy Glide, et Fake Out. Assault Vest compense sa SpD moyenne.", format: "VGC" }
+    ],
+    notes: "Grassy Surge + Grassy Glide lui donne l'une des meilleures attaques prioritaires du jeu."
+  },
+  {
+    name: "Urshifu-Rapid-Strike",
+    types: ["Fighting", "Water"],
+    baseStats: [100, 130, 100, 63, 60, 97],
+    tier: "OU / VGC",
+    role: ["Wallbreaker", "Setup Sweeper"],
+    keyAbilities: ["Unseen Fist"],
+    keyMoves: ["Surging Strikes", "Close Combat", "Aqua Jet", "U-turn", "Swords Dance"],
+    commonSets: [
+      { name: "Choice Scarf", item: "Choice Scarf", ability: "Unseen Fist", nature: "Jolly", evs: "252 Atk / 4 Def / 252 Spe", moves: ["Surging Strikes", "Close Combat", "U-turn", "Aqua Jet"], description: "Frappe à travers les Protect grâce à Unseen Fist. Surging Strikes crite toujours 3 fois, ignorant les baisses d'attaque et les boosts de défense adverses.", format: "Smogon OU" }
+    ],
+    notes: "La pire menace pour les walls défensifs car ses attaques ignorent Protect (en VGC) et crittent à chaque fois."
+  },
+  {
+    name: "Iron Hands",
+    types: ["Fighting", "Electric"],
+    baseStats: [154, 140, 108, 50, 68, 50],
+    tier: "VGC dominant / UU",
+    role: ["Bulky Attacker", "Trick Room Sweeper"],
+    keyAbilities: ["Quark Drive"],
+    keyMoves: ["Fake Out", "Drain Punch", "Wild Charge", "Heavy Slam", "Swords Dance", "Volt Switch"],
+    commonSets: [
+      { name: "Assault Vest VGC", item: "Assault Vest", ability: "Quark Drive", nature: "Adamant", evs: "248 HP / 252 Atk / 8 SpD", moves: ["Fake Out", "Drain Punch", "Wild Charge", "Heavy Slam"], description: "Tank colossal en VGC. Absorbe les coups Spéciaux avec l'AV, tape incroyablement fort et se soigne avec Drain Punch.", format: "VGC" }
+    ],
+    notes: "Un des rois du VGC récent. Son bulk de base [154/108/68] avec Assault Vest le rend presque impossible à OHKO."
+  },
+  {
+    name: "Ogerpon-Wellspring",
+    types: ["Grass", "Water"],
+    baseStats: [80, 120, 84, 60, 96, 110],
+    tier: "OU / VGC",
+    role: ["Setup Sweeper", "Wallbreaker", "Redirector (VGC)"],
+    keyAbilities: ["Water Absorb"],
+    keyMoves: ["Ivy Cudgel", "Horn Leech", "Swords Dance", "Spiky Shield", "Follow Me"],
+    commonSets: [
+      { name: "Swords Dance (OU)", item: "Wellspring Mask", ability: "Water Absorb", nature: "Jolly", evs: "252 Atk / 4 SpD / 252 Spe", moves: ["Swords Dance", "Ivy Cudgel", "Horn Leech", "Knock Off"], description: "Water Absorb empêche les switch sur des moves Eau, puis SD et sweep. Ivy Cudgel Eau a un taux de crit élevé.", format: "Smogon OU" },
+      { name: "Support (VGC)", item: "Wellspring Mask", ability: "Water Absorb", nature: "Jolly", evs: "252 HP / 4 Atk / 252 Spe", moves: ["Follow Me", "Spiky Shield", "Ivy Cudgel", "Horn Leech"], description: "Redirection clé avec Follow Me pour protéger ses alliés. Masque Puits lui donne un boost en Def Spéciale lors du Terastal.", format: "VGC" }
+    ],
+    notes: "Pression incroyable en VGC et OU. Son attaque signature Ivy Cudgel (Eau) fait de lourds dégâts et sa versatilité de redirection la rend très utile."
+  }
 ];
 
 export const STAT_LABELS = ["PV", "Atq", "Déf", "A.Sp", "D.Sp", "Vit"];

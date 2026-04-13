@@ -1,7 +1,25 @@
 const API_BASE = "https://pokeapi.co/api/v2";
 
 // Cache to avoid re-fetching
-const cache: Record<string, unknown> = {};
+// Use localStorage if available, fallback to memory
+let cache: Record<string, unknown> = {};
+try {
+  const localCache = localStorage.getItem('pokeapi_cache');
+  if (localCache) cache = JSON.parse(localCache);
+} catch (e) {
+  // Ignore localStorage errors
+}
+
+const saveCache = () => {
+  try {
+    localStorage.setItem('pokeapi_cache', JSON.stringify(cache));
+  } catch (e) {
+    if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+      cache = {};
+      try { localStorage.removeItem('pokeapi_cache'); } catch (e2) {} // Ignore
+    }
+  }
+};
 
 async function fetchCached<T>(url: string): Promise<T> {
   if (cache[url]) return cache[url] as T;
@@ -9,6 +27,7 @@ async function fetchCached<T>(url: string): Promise<T> {
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   const data = await res.json();
   cache[url] = data;
+  saveCache();
   return data as T;
 }
 

@@ -22,6 +22,7 @@ export function MoveExplorerSection() {
   const [listLoading, setListLoading] = useState(true);
   const [error, setError] = useState("");
   const [showLearners, setShowLearners] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(30);
 
   useEffect(() => {
     fetchMoveList(950).then(list => {
@@ -48,9 +49,15 @@ export function MoveExplorerSection() {
     if (selectedMove) loadMove(selectedMove);
   }, [selectedMove, loadMove]);
 
+  useEffect(() => {
+    setVisibleCount(30);
+  }, [search]);
+
   const filteredList = allMoves.filter(m =>
     !search || m.name.includes(search.toLowerCase().replace(/ /g, "-"))
-  ).slice(0, 80);
+  );
+  
+  const currentVisible = filteredList.slice(0, visibleCount);
 
   const frFlavor = moveData ? getMoveFrenchFlavor(moveData) : "";
   const enEffect = moveData ? getMoveEnglishEffect(moveData) : "";
@@ -81,8 +88,8 @@ export function MoveExplorerSection() {
               {listLoading ? "Chargement..." : `${allMoves.length} moves · Entrée pour chercher`}
             </p>
           </div>
-          <div className="max-h-[550px] overflow-y-auto">
-            {filteredList.map(m => (
+          <div className="max-h-[550px] overflow-y-auto pb-2">
+            {currentVisible.map(m => (
               <button
                 key={m.name}
                 onClick={() => setSelectedMove(m.name)}
@@ -92,6 +99,14 @@ export function MoveExplorerSection() {
                 <span className="text-zinc-200">{capitalize(m.name)}</span>
               </button>
             ))}
+            {visibleCount < filteredList.length && (
+              <button 
+                onClick={() => setVisibleCount(v => v + 30)}
+                className="w-full text-center px-3 py-3 mt-1 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
+              >
+                Voir plus ({filteredList.length - visibleCount} restants)
+              </button>
+            )}
           </div>
         </div>
 
