@@ -27,7 +27,7 @@ const NAV_ITEMS = [
   { id: "mechanics", label: "Mécaniques", icon: "⚙" },
   { id: "pokedex", label: "Pokédex", icon: "◉" },
   { id: "team", label: "Teambuilding", icon: "◈" },
-  { id: "builder", label: "Builder", icon: "🔧" },
+  { id: "builder", label: "Builder", icon: "⊞" },
   { id: "calc", label: "Calculateur", icon: "⊕" },
   { id: "gens", label: "Générations", icon: "∞" },
   { id: "glossary", label: "Glossaire", icon: "A" },
@@ -37,6 +37,9 @@ const NAV_ITEMS = [
 type Theme = 'dark' | 'light';
 type FontSize = 'sm' | 'base' | 'lg';
 
+// rem-based Tailwind sizes cascade from html font-size
+const FONT_SIZE_MAP: Record<FontSize, string> = { sm: '14px', base: '16px', lg: '18px' };
+
 function App() {
   const [activeTab, setActiveTab] = useState("types");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -44,25 +47,22 @@ function App() {
   const [fontSize, setFontSize] = useState<FontSize>('base');
   const [showSettings, setShowSettings] = useState(false);
 
-  // Apply theme via data-attribute on <html> — CSS overrides target this
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Apply font scale on <html> so all rem-based Tailwind sizes cascade
   useEffect(() => {
-    const sizeMap: Record<FontSize, string> = { sm: '14px', base: '16px', lg: '18px' };
-    document.documentElement.style.fontSize = sizeMap[fontSize];
+    document.documentElement.style.fontSize = FONT_SIZE_MAP[fontSize];
   }, [fontSize]);
 
   const bgMain = theme === 'dark' ? 'bg-zinc-950 text-zinc-100' : 'bg-white text-zinc-900';
   const bgHeader = theme === 'dark' ? 'bg-zinc-950/80 border-zinc-800' : 'bg-white/90 border-zinc-200';
   const bgNav = theme === 'dark' ? 'bg-zinc-950/95 border-zinc-800' : 'bg-zinc-50/95 border-zinc-200';
-  const textMuted = theme === 'dark' ? 'text-zinc-500' : 'text-zinc-500';
+  const textMuted = 'text-zinc-500';
   const btnInactive = theme === 'dark' ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-500 hover:text-zinc-700';
 
   return (
-    <div className={`min-h-screen ${bgMain}`} data-theme={theme}>
+    <div className={`min-h-screen ${bgMain}`}>
       {/* Header */}
       <header className={`border-b ${bgHeader} backdrop-blur-sm sticky top-0 z-50`}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 sm:gap-3">
@@ -78,7 +78,7 @@ function App() {
             className={`p-1.5 sm:p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'} transition-colors`}
             title="Paramètres"
           >
-            <span className="text-sm">⚙️</span>
+            <span className="text-sm">⚙</span>
           </button>
 
           {/* Mobile menu button */}

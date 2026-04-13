@@ -359,7 +359,7 @@ export function TeamBuilderSection() {
                       )}
                     </div>
                     {isProblematic && (
-                      <div className="text-[9px] text-red-400 mt-1 font-semibold">⚠️ Risqué</div>
+                      <div className="text-[9px] text-red-400 mt-1 font-semibold">! Risqué</div>
                     )}
                   </div>
                 );
@@ -423,7 +423,7 @@ export function TeamBuilderSection() {
               <div className="space-y-2">
                 {warnings.map((warning, i) => (
                   <div key={i} className="p-3 bg-yellow-900/20 border border-yellow-600/50 rounded text-sm text-yellow-300">
-                    ⚠️ {warning}
+                    ! {warning}
                   </div>
                 ))}
               </div>
