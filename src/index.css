@@ -57,3 +57,34 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Light theme overrides ───────────────────────────────────────────────────
+   When data-theme="light" is set on <html>, remap the dark zinc palette
+   used throughout all section components.                                    */
+[data-theme="light"] {
+  /* backgrounds */
+  .bg-zinc-950 { background-color: #f8fafc !important; }
+  .bg-zinc-900 { background-color: #f1f5f9 !important; }
+  .bg-zinc-800 { background-color: #e2e8f0 !important; }
+  .bg-zinc-700 { background-color: #cbd5e1 !important; }
+
+  /* borders */
+  .border-zinc-800 { border-color: #cbd5e1 !important; }
+  .border-zinc-700 { border-color: #94a3b8 !important; }
+
+  /* text */
+  .text-zinc-100 { color: #0f172a !important; }
+  .text-zinc-200 { color: #1e293b !important; }
+  .text-zinc-300 { color: #334155 !important; }
+  .text-zinc-400 { color: #475569 !important; }
+  .text-zinc-500 { color: #64748b !important; }
+
+  /* inputs & selects */
+  input, select, textarea {
+    background-color: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+  }
+  input::placeholder { color: #94a3b8; }
+  input:focus, select:focus { border-color: #dc2626; }
+}
