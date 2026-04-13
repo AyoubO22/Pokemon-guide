@@ -50,6 +50,8 @@ function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    // Fix overscroll showing white background
+    document.body.className = theme === 'dark' ? 'bg-zinc-950 text-zinc-100' : 'bg-white text-zinc-900';
   }, [theme]);
 
   useEffect(() => {
