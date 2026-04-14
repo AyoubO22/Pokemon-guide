@@ -186,6 +186,9 @@ export function PokedexSection() {
   const frDesc = speciesData ? getFrenchDescription(speciesData) : "";
   const frGenus = speciesData ? getFrenchGenus(speciesData) : "";
 
+  // Mobile master-detail navigation
+  const [mobileView, setMobileView] = useState<'list' | 'detail'>('list');
+
   // Curated
   const curatedAllRoles = ["Tous", ...Array.from(new Set(TOP_POKEMON.flatMap(p => p.role)))];
   const curatedFiltered = TOP_POKEMON.filter(p => curatedRoleFilter === "Tous" || p.role.includes(curatedRoleFilter));
@@ -221,7 +224,7 @@ export function PokedexSection() {
       {view === 'api' && (
         <div className="grid md:grid-cols-[280px_1fr] gap-4 items-start">
           {/* Search & List */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex flex-col sticky top-[110px] max-h-[calc(100vh-130px)]">
+          <div className={`bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex-col md:sticky md:top-[110px] md:max-h-[calc(100vh-130px)] ${mobileView === 'detail' ? 'hidden md:flex' : 'flex'}`}>
             <div className="p-2 border-b border-zinc-800 space-y-1.5 shrink-0">
               <input
                 type="text"
@@ -254,7 +257,7 @@ export function PokedexSection() {
                 return (
                   <button
                     key={p.name}
-                    onClick={() => setSelectedName(p.name)}
+                    onClick={() => { setSelectedName(p.name); setMobileView('detail'); }}
                     className={`w-full text-left px-3 py-2 border-b border-zinc-800/30 text-sm transition-colors flex items-center gap-2
                       ${selectedName === p.name ? 'bg-zinc-800 border-l-2 border-l-red-500' : 'hover:bg-zinc-800/50'}`}
                   >
@@ -270,7 +273,13 @@ export function PokedexSection() {
           </div>
 
           {/* Pokemon Detail */}
-          <div className="space-y-4">
+          <div className={`space-y-4 ${mobileView === 'list' ? 'hidden md:block' : 'block'}`}>
+            <button
+              onClick={() => setMobileView('list')}
+              className="md:hidden flex items-center gap-1 text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+            >
+              ← Retour à la liste
+            </button>
             {loading && (
               <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-8 text-center">
                 <div className="animate-pulse text-zinc-500">Chargement depuis PokéAPI...</div>
