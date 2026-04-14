@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { TOP_POKEMON, STAT_LABELS, STAT_COLORS } from '../data/pokemon'
 import { TYPE_COLORS, TYPES } from '../data/types'
 import {
@@ -47,6 +47,13 @@ export function PokedexSection() {
   const [inspectedMove, setInspectedMove] = useState<MoveData | null>(null);
   const [moveLoading, setMoveLoading] = useState(false);
 
+  // French name cache: lowercase french name → api english name
+  const [frenchNameCache, setFrenchNameCache] = useState<Record<string, string>>({});
+
+  // Mega evolutions
+  const [megaPokemon, setMegaPokemon] = useState<PokemonListEntry[]>([]);
+  const [showMegas, setShowMegas] = useState(false);
+
   // Ability tooltip — fixed position to avoid overflow clipping
   const [abilityCache, setAbilityCache] = useState<Record<string, string>>({});
   const [abilityTooltip, setAbilityTooltip] = useState<{ name: string; x: number; y: number } | null>(null);
@@ -82,26 +89,63 @@ export function PokedexSection() {
   const [selectedCurated, setSelectedCurated] = useState(TOP_POKEMON[0].name);
   const [curatedRoleFilter, setCuratedRoleFilter] = useState("Tous");
 
-  // Load pokemon list
+  // Scan existing localStorage cache for French names on mount
   useEffect(() => {
-    fetchPokemonList(1025).then(list => {
-      setAllPokemon(list);
+    try {
+      const raw = localStorage.getItem('pokeapi_cache');
+      if (!raw) return;
+      const cacheData = JSON.parse(raw) as Record<string, unknown>;
+      const map: Record<string, string> = {};
+      Object.entries(cacheData).forEach(([url, data]) => {
+        if (!url.includes('/pokemon-species/') || !data || typeof data !== 'object') return;
+        const species = data as PokemonSpeciesData;
+        if (!Array.isArray(species.names)) return;
+        const frEntry = species.names.find((n: { name: string; language: { name: string } }) => n.language.name === 'fr');
+        if (!frEntry) return;
+        const engName = url.split('/').filter(Boolean).pop();
+        if (engName) map[frEntry.name.toLowerCase()] = engName;
+      });
+      if (Object.keys(map).length > 0) setFrenchNameCache(map);
+    } catch { /* ignore */ }
+  }, []);
+
+  // Load pokemon list (1500 to include megas)
+  useEffect(() => {
+    fetchPokemonList(1500).then(list => {
+      const regular: PokemonListEntry[] = [];
+      const megas: PokemonListEntry[] = [];
+      list.forEach(p => {
+        const id = Number(p.url.split('/').filter(Boolean).pop());
+        if (id >= 1 && id <= 1025) regular.push(p);
+        else if (p.name.includes('-mega')) megas.push(p);
+      });
+      setAllPokemon(regular);
+      setMegaPokemon(megas);
       setListLoading(false);
     }).catch(() => setListLoading(false));
   }, []);
 
-  // Load selected pokemon
+  // Load selected pokemon — mega forms use the base species
   const loadPokemon = useCallback(async (name: string) => {
     setLoading(true);
     setError("");
     setEvoChain([]);
     try {
+      // For mega forms: strip -mega, -mega-x, -mega-y to get base species name
+      const baseSpeciesName = name.replace(/-mega(-[xy])?$/, '');
       const [pData, sData] = await Promise.all([
         fetchPokemon(name),
-        fetchPokemonSpecies(name).catch(() => null)
+        fetchPokemonSpecies(baseSpeciesName).catch(() => null)
       ]);
       setPokemonData(pData);
       setSpeciesData(sData);
+      // Update French name cache from freshly loaded species
+      if (sData) {
+        const frName = getFrenchName(sData);
+        if (frName) {
+          setFrenchNameCache(prev => ({ ...prev, [frName.toLowerCase()]: baseSpeciesName }));
+        }
+      }
       if (sData?.evolution_chain?.url) {
         try {
           const evoData = await fetchEvolutionChain(sData.evolution_chain.url);
@@ -109,7 +153,7 @@ export function PokedexSection() {
         } catch { /* ignore */ }
       }
     } catch {
-      setError("Pokémon non trouvé. Vérifie le nom (en anglais).");
+      setError("Pokémon non trouvé.");
       setPokemonData(null);
       setSpeciesData(null);
     }
@@ -120,9 +164,22 @@ export function PokedexSection() {
     if (view === 'api' && selectedName) loadPokemon(selectedName);
   }, [selectedName, view, loadPokemon]);
 
-  const filteredList = allPokemon.filter(p =>
-    !search || p.name.includes(search.toLowerCase()) || p.url.split("/").filter(Boolean).pop() === search
-  ).slice(0, 80);
+  const filteredList = useMemo(() => {
+    const base = showMegas ? megaPokemon : allPokemon;
+    if (!search) return base.slice(0, 80);
+    const s = search.toLowerCase().trim();
+    return base.filter(p => {
+      if (p.name.includes(s)) return true;
+      const id = p.url.split('/').filter(Boolean).pop();
+      if (id === s) return true;
+      // French name: exact key match
+      if (frenchNameCache[s] === p.name) return true;
+      // French name: partial match (e.g. "drauca" → "dracaufeu")
+      return Object.entries(frenchNameCache).some(([fr, en]) =>
+        fr.includes(s) && en === p.name
+      );
+    }).slice(0, 80);
+  }, [search, showMegas, allPokemon, megaPokemon, frenchNameCache]);
 
   const bst = pokemonData ? pokemonData.stats.reduce((a, s) => a + s.base_stat, 0) : 0;
   const frName = speciesData ? getFrenchName(speciesData) : "";
@@ -140,8 +197,8 @@ export function PokedexSection() {
       <div>
         <h2 className="text-2xl font-bold mb-2">Pokédex Compétitif</h2>
         <p className="text-zinc-400 text-sm leading-relaxed max-w-3xl">
-          Explore les <strong className="text-zinc-200">1025 Pokémon</strong> existants via l'API PokéAPI en temps réel,
-          ou consulte les fiches stratégiques détaillées des Pokémon les plus importants du metagame.
+          Explore les <strong className="text-zinc-200">1025 Pokémon</strong> + <strong className="text-zinc-200">Méga-Évolutions</strong> via PokéAPI en temps réel.
+          Recherche par nom français ou anglais · Fiches stratégiques pour le metagame.
         </p>
       </div>
 
@@ -165,18 +222,31 @@ export function PokedexSection() {
         <div className="grid md:grid-cols-[280px_1fr] gap-4">
           {/* Search & List */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-            <div className="p-2 border-b border-zinc-800">
+            <div className="p-2 border-b border-zinc-800 space-y-1.5">
               <input
                 type="text"
-                placeholder="Nom ou numéro..."
+                placeholder="Nom FR/EN ou numéro..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter" && search) { setSelectedName(search.toLowerCase()); } }}
                 className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-sm"
               />
-              <p className="text-[10px] text-zinc-600 mt-1">
-                {listLoading ? "Chargement de la liste..." : `${allPokemon.length} Pokémon disponibles · Entrée pour chercher`}
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-[10px] text-zinc-600">
+                  {listLoading ? "Chargement..." : showMegas ? `${megaPokemon.length} Méga-Évolutions` : `${allPokemon.length} Pokémon`}
+                </p>
+                <button
+                  onClick={() => setShowMegas(v => !v)}
+                  className={`text-[10px] px-2 py-0.5 rounded font-medium transition-colors ${showMegas ? 'bg-purple-700 text-white' : 'bg-zinc-800 text-zinc-500 hover:text-zinc-300'}`}
+                >
+                  Méga
+                </button>
+              </div>
+              {Object.keys(frenchNameCache).length > 0 && (
+                <p className="text-[10px] text-zinc-700">
+                  {Object.keys(frenchNameCache).length} noms FR en cache
+                </p>
+              )}
             </div>
             <div className="max-h-[550px] overflow-y-auto">
               {filteredList.map(p => {
@@ -189,7 +259,10 @@ export function PokedexSection() {
                       ${selectedName === p.name ? 'bg-zinc-800 border-l-2 border-l-red-500' : 'hover:bg-zinc-800/50'}`}
                   >
                     <span className="text-zinc-600 text-xs font-mono w-8">#{id}</span>
-                    <span className="text-zinc-200">{capitalize(p.name)}</span>
+                    <span className="text-zinc-200 flex-1">{capitalize(p.name)}</span>
+                    {p.name.includes('-mega') && (
+                      <span className="text-[9px] bg-purple-900/50 text-purple-300 px-1 py-0.5 rounded shrink-0">Méga</span>
+                    )}
                   </button>
                 );
               })}
@@ -232,6 +305,7 @@ export function PokedexSection() {
                         <span className="text-zinc-500 text-sm font-mono">#{pokemonData.id}</span>
                         <h3 className="text-xl font-bold text-zinc-100">{capitalize(pokemonData.name)}</h3>
                         {frName && <span className="text-sm text-zinc-400">({frName})</span>}
+                        {pokemonData.name.includes('-mega') && <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded">Méga-Évolution</span>}
                         {speciesData?.is_legendary && <span className="text-[10px] bg-yellow-900/40 text-yellow-300 px-1.5 py-0.5 rounded">Légendaire</span>}
                         {speciesData?.is_mythical && <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded">Fabuleux</span>}
                         <button
