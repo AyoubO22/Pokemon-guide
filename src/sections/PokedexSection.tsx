@@ -34,7 +34,7 @@ function StatBar({ label, value, max, color, index }: { label: string; value: nu
 const STAT_ORDER = ["hp", "attack", "defense", "special-attack", "special-defense", "speed"];
 
 export function PokedexSection() {
-  const [view, setView] = useState<'api' | 'curated'>('api');
+  const [view, setView] = useState<'api' | 'curated' | 'favorites'>('api');
   const [allPokemon, setAllPokemon] = useState<PokemonListEntry[]>([]);
   const [search, setSearch] = useState("");
   const [selectedName, setSelectedName] = useState("garchomp");
@@ -46,6 +46,18 @@ export function PokedexSection() {
   const [error, setError] = useState("");
   const [inspectedMove, setInspectedMove] = useState<MoveData | null>(null);
   const [moveLoading, setMoveLoading] = useState(false);
+
+  // Favorites
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    try { return JSON.parse(localStorage.getItem('pokemon_favorites') || '[]'); } catch { return []; }
+  });
+  const toggleFavorite = useCallback((name: string) => {
+    setFavorites(prev => {
+      const updated = prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name];
+      try { localStorage.setItem('pokemon_favorites', JSON.stringify(updated)); } catch { /* ignore */ }
+      return updated;
+    });
+  }, []);
 
   // Curated view state
   const [selectedCurated, setSelectedCurated] = useState(TOP_POKEMON[0].name);
@@ -114,7 +126,7 @@ export function PokedexSection() {
         </p>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <button onClick={() => setView('api')}
           className={`px-3 py-1.5 text-sm rounded font-medium ${view === 'api' ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
           Pokédex Complet (API)
@@ -122,6 +134,10 @@ export function PokedexSection() {
         <button onClick={() => setView('curated')}
           className={`px-3 py-1.5 text-sm rounded font-medium ${view === 'curated' ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
           Fiches Stratégiques
+        </button>
+        <button onClick={() => setView('favorites')}
+          className={`px-3 py-1.5 text-sm rounded font-medium ${view === 'favorites' ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+          Favoris{favorites.length > 0 ? ` (${favorites.length})` : ''}
         </button>
       </div>
 
@@ -199,6 +215,13 @@ export function PokedexSection() {
                         {frName && <span className="text-sm text-zinc-400">({frName})</span>}
                         {speciesData?.is_legendary && <span className="text-[10px] bg-yellow-900/40 text-yellow-300 px-1.5 py-0.5 rounded">Légendaire</span>}
                         {speciesData?.is_mythical && <span className="text-[10px] bg-purple-900/40 text-purple-300 px-1.5 py-0.5 rounded">Fabuleux</span>}
+                        <button
+                          onClick={() => toggleFavorite(pokemonData.name)}
+                          className={`ml-auto text-xl leading-none transition-colors ${favorites.includes(pokemonData.name) ? 'text-red-400' : 'text-zinc-600 hover:text-zinc-400'}`}
+                          title={favorites.includes(pokemonData.name) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                        >
+                          {favorites.includes(pokemonData.name) ? '♥' : '♡'}
+                        </button>
                       </div>
 
                       {frGenus && <p className="text-xs text-zinc-500 mb-2">{frGenus}</p>}
@@ -596,6 +619,41 @@ export function PokedexSection() {
         </div>
       )}
 
+      {/* ============ FAVORITES VIEW ============ */}
+      {view === 'favorites' && (
+        <div className="space-y-4">
+          <p className="text-sm text-zinc-400">Tes Pokémon favoris sauvegardés localement.</p>
+          {favorites.length === 0 ? (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-10 text-center">
+              <p className="text-3xl mb-3 text-zinc-600">♡</p>
+              <p className="text-sm text-zinc-400">Aucun favori pour l'instant.</p>
+              <p className="text-xs text-zinc-600 mt-1">Clique sur ♡ dans la fiche d'un Pokémon pour l'ajouter.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-3">
+              {favorites.map(name => (
+                <div key={name} className="bg-zinc-900 border border-zinc-800 rounded-lg p-3 flex items-center gap-3">
+                  <button
+                    className="flex-1 text-left"
+                    onClick={() => { setSelectedName(name); setView('api'); }}
+                  >
+                    <p className="font-medium text-zinc-200">{capitalize(name)}</p>
+                    <p className="text-xs text-zinc-500">Voir dans le Pokédex</p>
+                  </button>
+                  <button
+                    onClick={() => toggleFavorite(name)}
+                    className="text-red-400 hover:text-red-300 text-xl leading-none transition-colors"
+                    title="Retirer des favoris"
+                  >
+                    ♥
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ============ CURATED VIEW ============ */}
       {view === 'curated' && (
         <div className="space-y-4">
@@ -640,7 +698,14 @@ export function PokedexSection() {
                         return <span key={t!} className="inline-block px-2 py-1 rounded text-xs font-medium text-white" style={{ backgroundColor: color }}>{fr}</span>;
                       })}
                     </div>
-                    <span className="text-xs text-zinc-500 ml-auto">{curatedPkm.tier}</span>
+                    <span className="text-xs text-zinc-500">{curatedPkm.tier}</span>
+                    <button
+                      onClick={() => toggleFavorite(curatedPkm.name.toLowerCase().replace(" ", "-"))}
+                      className={`ml-auto text-xl leading-none transition-colors ${favorites.includes(curatedPkm.name.toLowerCase().replace(" ", "-")) ? 'text-red-400' : 'text-zinc-600 hover:text-zinc-400'}`}
+                      title={favorites.includes(curatedPkm.name.toLowerCase().replace(" ", "-")) ? "Retirer des favoris" : "Ajouter aux favoris"}
+                    >
+                      {favorites.includes(curatedPkm.name.toLowerCase().replace(" ", "-")) ? '♥' : '♡'}
+                    </button>
                   </div>
                   <div className="flex flex-wrap gap-1 mb-4">
                     {curatedPkm.role.map(r => <span key={r} className="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded">{r}</span>)}

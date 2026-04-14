@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 
 // ============ QUIZ DATA ============
 
@@ -123,6 +123,20 @@ export function QuizSection() {
   const [answered, setAnswered] = useState(false);
   const [answers, setAnswers] = useState<{ question: string; correct: boolean; explanation: string }[]>([]);
   const [questionCount, setQuestionCount] = useState(10);
+  const [quizHistory, setQuizHistory] = useState<{ date: string; category: string; score: number; total: number }[]>(() => {
+    try { return JSON.parse(localStorage.getItem('quiz_history') || '[]'); } catch { return []; }
+  });
+
+  // Save score to history when quiz ends
+  useEffect(() => {
+    if (mode !== 'results' || questions.length === 0) return;
+    const record = { date: new Date().toLocaleDateString('fr-FR'), category, score, total: questions.length };
+    setQuizHistory(prev => {
+      const updated = [record, ...prev].slice(0, 10);
+      try { localStorage.setItem('quiz_history', JSON.stringify(updated)); } catch { /* ignore */ }
+      return updated;
+    });
+  }, [mode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const availableCount = useMemo(() => {
     if (category === "Tous") return ALL_QUESTIONS.length;
@@ -287,6 +301,27 @@ export function QuizSection() {
               </div>
             ))}
           </div>
+
+          {/* Score history */}
+          {quizHistory.length > 0 && (
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+              <h4 className="font-semibold text-zinc-200 mb-3 text-sm">Historique des scores</h4>
+              <div className="space-y-2">
+                {quizHistory.slice(0, 5).map((r, i) => {
+                  const pct = Math.round(r.score / r.total * 100);
+                  const color = pct >= 90 ? 'text-yellow-400' : pct >= 70 ? 'text-green-400' : pct >= 50 ? 'text-blue-400' : 'text-red-400';
+                  return (
+                    <div key={i} className="flex items-center gap-3">
+                      <span className="text-zinc-600 text-xs w-16 shrink-0">{r.date}</span>
+                      <span className="text-zinc-400 text-xs flex-1">{r.category}</span>
+                      <span className={`font-mono font-bold text-sm ${color}`}>{r.score}/{r.total}</span>
+                      <span className={`text-xs w-8 text-right ${color}`}>{pct}%</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
