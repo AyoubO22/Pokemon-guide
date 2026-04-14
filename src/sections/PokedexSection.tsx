@@ -166,7 +166,7 @@ export function PokedexSection() {
 
   const filteredList = useMemo(() => {
     const base = showMegas ? megaPokemon : allPokemon;
-    if (!search) return base.slice(0, 80);
+    if (!search) return base.slice(0, 150);
     const s = search.toLowerCase().trim();
     return base.filter(p => {
       if (p.name.includes(s)) return true;
@@ -178,7 +178,7 @@ export function PokedexSection() {
       return Object.entries(frenchNameCache).some(([fr, en]) =>
         fr.includes(s) && en === p.name
       );
-    }).slice(0, 80);
+    }).slice(0, 150);
   }, [search, showMegas, allPokemon, megaPokemon, frenchNameCache]);
 
   const bst = pokemonData ? pokemonData.stats.reduce((a, s) => a + s.base_stat, 0) : 0;
@@ -248,7 +248,7 @@ export function PokedexSection() {
                 </p>
               )}
             </div>
-            <div className="max-h-[550px] overflow-y-auto">
+            <div className="max-h-[calc(100vh-220px)] overflow-y-auto">
               {filteredList.map(p => {
                 const id = p.url.split("/").filter(Boolean).pop();
                 return (
