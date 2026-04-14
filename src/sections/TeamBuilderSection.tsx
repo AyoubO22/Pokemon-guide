@@ -18,16 +18,15 @@ function toShowdownExport(team: (TeamMember | null)[]): string {
       const name = toShowdownName(p.name);
       const abilityRaw = p.abilities.find(a => !a.is_hidden)?.ability.name || p.abilities[0]?.ability.name || '';
       const ability = abilityRaw ? toShowdownAbility(abilityRaw) : '';
+      const item = slot.item ? ` @ ${slot.item}` : '';
+      const moves = Array(4).fill('').map((_, i) => slot.moves?.[i] || '');
       return [
-        name,
+        `${name}${item}`,
         ability ? `Ability: ${ability}` : '',
         'Level: 100',
         'EVs: 252 Atk / 4 SpD / 252 Spe',
         'Jolly Nature',
-        '- ',
-        '- ',
-        '- ',
-        '- ',
+        ...moves.map(m => m ? `- ${m}` : '- '),
       ].filter(Boolean).join('\n');
     })
     .join('\n\n');
@@ -48,13 +47,77 @@ const TYPE_EFFECTIVENESS: Record<string, string[]> = {
 interface TeamMember {
   pokemon: PokemonData;
   role?: string;
+  item?: string;
+  moves?: string[]; // 4 move names (formatted for Showdown: "Dragon Claw")
 }
 
 interface SavedTeam {
   id: string;
   name: string;
-  members: { pokemonName: string; role: string }[];
+  members: { pokemonName: string; role: string; item?: string; moves?: string[] }[];
+  explanation?: string;
   savedAt: number;
+}
+
+const COMPETITIVE_ITEMS: { group: string; items: string[] }[] = [
+  { group: 'Récupération', items: ['Leftovers', 'Black Sludge', 'Shell Bell'] },
+  { group: 'Défensif', items: ['Rocky Helmet', 'Assault Vest', 'Eviolite', 'Focus Sash', 'Air Balloon', 'Heavy-Duty Boots', 'Safety Goggles', 'Covert Cloak', 'Shed Shell'] },
+  { group: 'Choice', items: ['Choice Band', 'Choice Specs', 'Choice Scarf'] },
+  { group: 'Puissance', items: ['Life Orb', 'Expert Belt', 'Muscle Band', 'Wise Glasses', 'Scope Lens', 'Razor Claw', 'Loaded Dice', 'Punching Glove', 'Throat Spray'] },
+  { group: 'Setup', items: ['Weakness Policy', 'Booster Energy', 'White Herb', 'Power Herb', 'Mental Herb', 'Mirror Herb', 'Blunder Policy', 'Clear Amulet'] },
+  { group: 'Terrain / Météo', items: ['Terrain Extender', 'Light Clay', 'Heat Rock', 'Damp Rock', 'Smooth Rock', 'Icy Rock'] },
+  { group: 'Status', items: ['Flame Orb', 'Toxic Orb', 'Iron Ball', 'Lagging Tail'] },
+  { group: 'Baies récup.', items: ['Sitrus Berry', 'Lum Berry', 'Iapapa Berry'] },
+  { group: 'Baies résist.', items: ['Occa Berry', 'Passho Berry', 'Wacan Berry', 'Rindo Berry', 'Yache Berry', 'Chople Berry', 'Shuca Berry', 'Coba Berry', 'Payapa Berry', 'Kasib Berry', 'Haban Berry', 'Colbur Berry', 'Babiri Berry', 'Roseli Berry'] },
+  { group: 'Baies pinch', items: ['Salac Berry', 'Petaya Berry', 'Liechi Berry', 'Apicot Berry', 'Custap Berry'] },
+];
+
+function moveFmt(raw: string): string {
+  return raw.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
+function generateTeamExplanation(members: TeamMember[]): string {
+  if (members.length === 0) return '';
+  const roles = members.map(m => m.role || detectRole(m.pokemon));
+  const trCount = roles.filter(r => r === 'Trick Room').length;
+  const fastCount = roles.filter(r => r === 'Rapide').length;
+  const atkCount = roles.filter(r => r === 'Attaquant').length;
+  const defCount = roles.filter(r => r === 'Défensif').length;
+
+  const lines: string[] = [];
+
+  // Archetype
+  if (trCount >= 2) {
+    const setters = members.filter(m => (m.role || detectRole(m.pokemon)) === 'Trick Room').map(m => capitalize(m.pokemon.name));
+    lines.push(`Archétype : Trick Room — pose le Trick Room avec ${setters.join(' ou ')} pour inverser les vitesses. Priorise les Pokémon lents et puissants.`);
+  } else if (fastCount >= 3 && atkCount >= 1) {
+    lines.push(`Archétype : Hyper Offensif — vitesse et pression maximales dès le départ. Elimine les menaces avant qu'elles agissent.`);
+  } else if (defCount >= 3) {
+    lines.push(`Archétype : Stall/Balance — attrition et switchs sécurisés. Use l'adversaire et capitalise sur les fautes.`);
+  } else if (atkCount >= 2 && defCount >= 1) {
+    lines.push(`Archétype : Balance — allie pression offensive et socle défensif pour s'adapter à tous les archétypes.`);
+  } else {
+    lines.push(`Équipe polyvalente — adapte ton style selon les matchups adverses.`);
+  }
+
+  // Key roles
+  const attackers = members.filter(m => ['Attaquant', 'Rapide'].includes(m.role || detectRole(m.pokemon)));
+  const walls = members.filter(m => (m.role || detectRole(m.pokemon)) === 'Défensif');
+  if (attackers.length) lines.push(`Menaces offensives : ${attackers.map(m => capitalize(m.pokemon.name)).join(', ')}.`);
+  if (walls.length) lines.push(`Noyau défensif : ${walls.map(m => capitalize(m.pokemon.name)).join(', ')} — absorbent les coups et sécurisent les switchs.`);
+
+  // Items hints
+  const choiceUsers = members.filter(m => m.item?.startsWith('Choice'));
+  if (choiceUsers.length) lines.push(`${choiceUsers.map(m => capitalize(m.pokemon.name)).join(', ')} ${choiceUsers.length > 1 ? 'sont verrouillés' : 'est verrouillé'} sur un move — engage uniquement sur des switchs prédictibles.`);
+  if (members.some(m => m.item === 'Focus Sash')) lines.push(`Le Focus Sash protège contre les OHKO — garde les PV au max avant l'engagement.`);
+  if (members.some(m => m.item === 'Life Orb')) lines.push(`Life Orb : puissance maximale avec souplesse de move, mais surveille les PV.`);
+  if (members.some(m => m.item === 'Booster Energy' || m.item === 'Weakness Policy')) lines.push(`Déclenche Booster Energy / Weakness Policy dès le bon moment pour une montée en puissance décisive.`);
+
+  // Win condition
+  const closers = attackers.length ? attackers.map(m => capitalize(m.pokemon.name)).join(' ou ') : members.map(m => capitalize(m.pokemon.name))[0];
+  lines.push(`Condition de victoire : établis le contrôle (${trCount > 0 ? 'Trick Room, ' : ''}${fastCount > 0 ? 'vitesse, ' : ''}${defCount > 0 ? 'attrition' : 'pression'}), puis conclue avec ${closers}.`);
+
+  return lines.join('\n\n');
 }
 
 const LS_KEY = 'team_builder_saved_teams';
@@ -176,12 +239,20 @@ function SearchPopup({ isOpen, pokemonList, onSelect, onClose }: SearchPopupProp
   );
 }
 
-function TeamSlot({ pokemon, onRemove, onAdd }: { pokemon: TeamMember | null; onRemove: () => void; onAdd: () => void }) {
+function TeamSlot({
+  pokemon, onRemove, onAdd, onItemChange, onMoveChange,
+}: {
+  pokemon: TeamMember | null;
+  onRemove: () => void;
+  onAdd: () => void;
+  onItemChange: (item: string) => void;
+  onMoveChange: (index: number, move: string) => void;
+}) {
   if (!pokemon) {
     return (
       <button
         onClick={onAdd}
-        className="bg-zinc-900 border-2 border-dashed border-zinc-700 rounded-lg p-6 hover:border-red-600 hover:bg-zinc-800 transition text-center"
+        className="bg-zinc-900 border-2 border-dashed border-zinc-700 rounded-lg p-6 hover:border-red-600 hover:bg-zinc-800 transition text-center w-full"
       >
         <div className="text-zinc-400 text-sm">Cliquer pour ajouter</div>
       </button>
@@ -189,40 +260,133 @@ function TeamSlot({ pokemon, onRemove, onAdd }: { pokemon: TeamMember | null; on
   }
 
   const bst = calculateBST(pokemon.pokemon);
+  const availableMoves = pokemon.pokemon.moves.map(m => moveFmt(m.move.name));
 
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 space-y-3">
+      {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <div className="flex-1">
-          <h4 className="font-bold text-white mb-1">{capitalize(pokemon.pokemon.name)}</h4>
-          <div className="flex gap-1 flex-wrap mb-2">
+        <div className="flex-1 min-w-0">
+          <h4 className="font-bold text-white mb-1 truncate">{capitalize(pokemon.pokemon.name)}</h4>
+          <div className="flex gap-1 flex-wrap mb-1.5">
             {pokemon.pokemon.types.map((t) => (
               <TypeBadge key={t.type.name} name={mapTypeName(t.type.name)} small />
             ))}
           </div>
           {pokemon.role && (
-            <div className="text-xs text-zinc-400 mb-2">
-              Rôle: <span className="text-red-400 font-medium">{pokemon.role}</span>
+            <div className="text-[11px] text-zinc-500">
+              <span className="text-red-400">{pokemon.role}</span>
+              {' · '}BST <span className="text-zinc-300">{bst}</span>
             </div>
           )}
-          <div className="text-xs text-zinc-500">
-            BST: <span className="text-zinc-300 font-medium">{bst}</span>
-          </div>
         </div>
         {pokemon.pokemon.sprites.other?.["official-artwork"]?.front_default && (
           <img
             src={pokemon.pokemon.sprites.other["official-artwork"].front_default}
             alt={pokemon.pokemon.name}
-            className="w-16 h-16 object-contain"
+            className="w-14 h-14 object-contain shrink-0"
           />
         )}
       </div>
+
+      {/* Item */}
+      <div>
+        <label className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1 block">Objet</label>
+        <select
+          value={pokemon.item || ''}
+          onChange={e => onItemChange(e.target.value)}
+          className="w-full bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-red-600"
+        >
+          <option value="">— Aucun objet —</option>
+          {COMPETITIVE_ITEMS.map(group => (
+            <optgroup key={group.group} label={group.group}>
+              {group.items.map(item => (
+                <option key={item} value={item}>{item}</option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+      </div>
+
+      {/* Moves */}
+      <div>
+        <label className="text-[10px] text-zinc-500 uppercase tracking-wide mb-1 block">Moves</label>
+        <div className="grid grid-cols-2 gap-1.5">
+          {[0, 1, 2, 3].map(i => (
+            <div key={i} className="relative">
+              <input
+                list={`moves-${pokemon.pokemon.name}-${i}`}
+                placeholder={`Move ${i + 1}`}
+                value={pokemon.moves?.[i] || ''}
+                onChange={e => onMoveChange(i, e.target.value)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded px-2 py-1.5 text-xs text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-red-600"
+              />
+              <datalist id={`moves-${pokemon.pokemon.name}-${i}`}>
+                {availableMoves.map(m => <option key={m} value={m} />)}
+              </datalist>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <button
         onClick={onRemove}
         className="w-full px-3 py-1.5 bg-red-600/20 hover:bg-red-600/40 text-red-400 rounded text-xs font-medium transition"
       >
         Retirer
       </button>
+    </div>
+  );
+}
+
+function SavedTeamCard({ saved, loading, onLoad, onDelete }: {
+  saved: SavedTeam;
+  loading: boolean;
+  onLoad: () => void;
+  onDelete: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="bg-zinc-800/50 border border-zinc-700/50 rounded-lg overflow-hidden">
+      <div className="flex items-center gap-3 px-3 py-2.5">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-zinc-200 truncate">{saved.name}</div>
+          <div className="text-[11px] text-zinc-500 truncate">
+            {saved.members.map(m => capitalize(m.pokemonName)).join(' · ')}
+          </div>
+        </div>
+        {saved.explanation && (
+          <button
+            onClick={() => setOpen(v => !v)}
+            className="shrink-0 px-2 py-1 text-zinc-500 hover:text-zinc-300 text-xs transition"
+            title="Guide de jeu"
+          >
+            {open ? '▲' : '▼'} Guide
+          </button>
+        )}
+        <button
+          onClick={onLoad}
+          disabled={loading}
+          className="shrink-0 px-2.5 py-1 bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 text-zinc-200 rounded text-xs font-medium transition"
+        >
+          {loading ? '...' : 'Charger'}
+        </button>
+        <button
+          onClick={onDelete}
+          className="shrink-0 px-2 py-1 text-zinc-500 hover:text-red-400 text-xs transition"
+          title="Supprimer"
+        >
+          ✕
+        </button>
+      </div>
+      {open && saved.explanation && (
+        <div className="border-t border-zinc-700/50 px-3 py-3 bg-zinc-950/50 space-y-2">
+          <p className="text-[10px] text-zinc-500 uppercase tracking-wide font-medium mb-2">Guide de jeu</p>
+          {saved.explanation.split('\n\n').map((para, i) => (
+            <p key={i} className="text-xs text-zinc-300 leading-relaxed">{para}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -241,15 +405,36 @@ export function TeamBuilderSection() {
   const [saveTeamName, setSaveTeamName] = useState('');
   const [loadingTeamId, setLoadingTeamId] = useState<string | null>(null);
 
+  const handleItemChange = (index: number, item: string) => {
+    const newTeam = [...team];
+    if (newTeam[index]) newTeam[index] = { ...newTeam[index]!, item };
+    setTeam(newTeam);
+  };
+
+  const handleMoveChange = (slotIndex: number, moveIndex: number, move: string) => {
+    const newTeam = [...team];
+    if (!newTeam[slotIndex]) return;
+    const moves = [...(newTeam[slotIndex]!.moves || ['', '', '', ''])];
+    moves[moveIndex] = move;
+    newTeam[slotIndex] = { ...newTeam[slotIndex]!, moves };
+    setTeam(newTeam);
+  };
+
   const handleSaveTeam = () => {
     const trimmed = saveTeamName.trim();
     if (!trimmed) return;
+    const activeMembers = team.filter((s): s is TeamMember => s !== null);
+    const explanation = generateTeamExplanation(activeMembers);
     const newEntry: SavedTeam = {
       id: Date.now().toString(),
       name: trimmed,
-      members: team
-        .filter((s): s is TeamMember => s !== null)
-        .map(s => ({ pokemonName: s.pokemon.name, role: s.role || '' })),
+      members: activeMembers.map(s => ({
+        pokemonName: s.pokemon.name,
+        role: s.role || '',
+        item: s.item,
+        moves: s.moves,
+      })),
+      explanation,
       savedAt: Date.now(),
     };
     const updated = [newEntry, ...savedTeams];
@@ -266,7 +451,7 @@ export function TeamBuilderSection() {
       saved.members.map(async (m, i) => {
         try {
           const pokemon = await fetchPokemon(m.pokemonName);
-          newTeam[i] = { pokemon, role: m.role };
+          newTeam[i] = { pokemon, role: m.role, item: m.item, moves: m.moves };
         } catch { /* skip */ }
       })
     );
@@ -305,7 +490,7 @@ export function TeamBuilderSection() {
       const pokemon = await fetchPokemon(entry.name);
       const role = detectRole(pokemon);
       const newTeam = [...team];
-      newTeam[index] = { pokemon, role };
+      newTeam[index] = { pokemon, role, item: '', moves: ['', '', '', ''] };
       setTeam(newTeam);
       setShowSearch(null);
     } catch (error) {
@@ -457,12 +642,12 @@ export function TeamBuilderSection() {
       {/* Save Team Modal */}
       {showSaveModal && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowSaveModal(false)}>
-          <div className="bg-zinc-900 border border-zinc-700 rounded-lg w-full max-w-sm" onClick={e => e.stopPropagation()}>
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b border-zinc-800">
               <h3 className="font-bold text-zinc-100">Sauvegarder l'équipe</h3>
               <button onClick={() => setShowSaveModal(false)} className="text-zinc-500 hover:text-zinc-300 text-xl leading-none">×</button>
             </div>
-            <div className="p-4 space-y-3">
+            <div className="p-4 space-y-4">
               <input
                 type="text"
                 autoFocus
@@ -472,6 +657,17 @@ export function TeamBuilderSection() {
                 onKeyDown={e => { if (e.key === 'Enter') handleSaveTeam(); }}
                 className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-500 focus:outline-none focus:border-red-600"
               />
+              {/* Preview explanation */}
+              {team.some(s => s) && (
+                <div className="bg-zinc-950 border border-zinc-800 rounded p-3 space-y-2">
+                  <p className="text-[10px] text-zinc-500 uppercase tracking-wide font-medium">Guide de jeu généré</p>
+                  {generateTeamExplanation(team.filter((s): s is TeamMember => s !== null))
+                    .split('\n\n')
+                    .map((para, i) => (
+                      <p key={i} className="text-xs text-zinc-300 leading-relaxed">{para}</p>
+                    ))}
+                </div>
+              )}
               <button
                 onClick={handleSaveTeam}
                 disabled={!saveTeamName.trim()}
@@ -490,28 +686,13 @@ export function TeamBuilderSection() {
           <h3 className="text-sm font-bold text-zinc-300 mb-3">Mes équipes sauvegardées</h3>
           <div className="space-y-2">
             {savedTeams.map(saved => (
-              <div key={saved.id} className="flex items-center gap-3 bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-3 py-2">
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-zinc-200 truncate">{saved.name}</div>
-                  <div className="text-[11px] text-zinc-500 truncate">
-                    {saved.members.map(m => capitalize(m.pokemonName)).join(' · ')}
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleLoadTeam(saved)}
-                  disabled={loadingTeamId === saved.id}
-                  className="shrink-0 px-2.5 py-1 bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 text-zinc-200 rounded text-xs font-medium transition"
-                >
-                  {loadingTeamId === saved.id ? '...' : 'Charger'}
-                </button>
-                <button
-                  onClick={() => handleDeleteTeam(saved.id)}
-                  className="shrink-0 px-2 py-1 text-zinc-500 hover:text-red-400 rounded text-xs transition"
-                  title="Supprimer"
-                >
-                  ✕
-                </button>
-              </div>
+              <SavedTeamCard
+                key={saved.id}
+                saved={saved}
+                loading={loadingTeamId === saved.id}
+                onLoad={() => handleLoadTeam(saved)}
+                onDelete={() => handleDeleteTeam(saved.id)}
+              />
             ))}
           </div>
         </div>
@@ -526,6 +707,8 @@ export function TeamBuilderSection() {
               pokemon={pokemon}
               onAdd={() => setShowSearch(index)}
               onRemove={() => handleRemove(index)}
+              onItemChange={(item) => handleItemChange(index, item)}
+              onMoveChange={(mi, move) => handleMoveChange(index, mi, move)}
             />
           </div>
         ))}
