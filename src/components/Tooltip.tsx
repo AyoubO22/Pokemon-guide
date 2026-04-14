@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 
 // Centralized glossary for tooltips — all competitive jargon in one place
 const JARGON: Record<string, string> = {
@@ -140,6 +140,19 @@ const JARGON: Record<string, string> = {
   "Z-Move": "Attaque ultime unique par combat. Gen 7",
 };
 
+type TooltipPos = { x: number; y: number; above: boolean } | null;
+
+function calcTooltipPos(ref: React.RefObject<HTMLSpanElement>): TooltipPos {
+  if (!ref.current) return null;
+  const rect = ref.current.getBoundingClientRect();
+  const above = rect.top > 140;
+  return {
+    x: rect.left + rect.width / 2,
+    y: above ? rect.top - 6 : rect.bottom + 6,
+    above,
+  };
+}
+
 // Tooltip component — wrap any text and it auto-detects jargon
 interface TooltipProps {
   children: string;
@@ -179,78 +192,74 @@ export function JargonText({ children, className = "" }: TooltipProps) {
   );
 }
 
-// Individual tooltip
+// Individual tooltip — uses position:fixed to avoid clipping by overflow:hidden parents
 function JargonTooltip({ term, display }: { term: string; display: string }) {
-  const [show, setShow] = useState(false);
-  const [pos, setPos] = useState<'above' | 'below'>('above');
+  const [pos, setPos] = useState<TooltipPos>(null);
   const ref = useRef<HTMLSpanElement>(null);
 
   const definition = JARGON[term] || JARGON[term.toLowerCase()] || JARGON[term.charAt(0).toUpperCase() + term.slice(1)] || "";
 
-  useEffect(() => {
-    if (show && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      setPos(rect.top < 120 ? 'below' : 'above');
-    }
-  }, [show]);
-
   if (!definition) return <span>{display}</span>;
+
+  const tooltipWidth = 256; // w-64
+  const safeLeft = pos ? Math.min(Math.max(pos.x - tooltipWidth / 2, 8), window.innerWidth - tooltipWidth - 8) : 0;
 
   return (
     <span
       ref={ref}
-      className="relative inline-block"
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
-      onTouchStart={() => setShow(!show)}
+      className="inline-block"
+      onMouseEnter={() => setPos(calcTooltipPos(ref))}
+      onMouseLeave={() => setPos(null)}
+      onTouchStart={() => setPos(p => p ? null : calcTooltipPos(ref))}
     >
       <span className="border-b border-dotted border-zinc-500 text-zinc-200 cursor-help">
         {display}
       </span>
-      {show && (
+      {pos && (
         <span
-          className={`absolute z-[100] left-1/2 -translate-x-1/2 w-64 px-3 py-2 rounded-lg shadow-xl
-            bg-zinc-800 border border-zinc-700 text-xs text-zinc-300 leading-relaxed pointer-events-none
-            ${pos === 'above' ? 'bottom-full mb-2' : 'top-full mt-2'}`}
+          className="fixed z-[9999] w-64 px-3 py-2 rounded-lg shadow-xl bg-zinc-800 border border-zinc-700 text-xs text-zinc-300 leading-relaxed pointer-events-none"
+          style={{
+            left: safeLeft,
+            top: pos.above ? pos.y : pos.y,
+            transform: pos.above ? 'translateY(-100%)' : 'none',
+          }}
         >
           <span className="font-semibold text-zinc-100 block mb-0.5">{term}</span>
           {definition}
-          <span className={`absolute left-1/2 -translate-x-1/2 w-2 h-2 bg-zinc-800 border border-zinc-700 rotate-45
-            ${pos === 'above' ? 'top-full -mt-1 border-t-0 border-l-0' : 'bottom-full -mb-1 border-b-0 border-r-0'}`} />
         </span>
       )}
     </span>
   );
 }
 
-// Simple standalone tooltip for manual use
+// Simple standalone tooltip for manual use — uses position:fixed to avoid clipping
 export function Tip({ term, children }: { term: string; children?: React.ReactNode }) {
   const definition = JARGON[term] || JARGON[term.toLowerCase()] || "";
-  const [show, setShow] = useState(false);
-  const [pos, setPos] = useState<'above' | 'below'>('above');
+  const [pos, setPos] = useState<TooltipPos>(null);
   const ref = useRef<HTMLSpanElement>(null);
 
-  useEffect(() => {
-    if (show && ref.current) {
-      const rect = ref.current.getBoundingClientRect();
-      setPos(rect.top < 120 ? 'below' : 'above');
-    }
-  }, [show]);
+  const tooltipWidth = 240; // w-60
+  const safeLeft = pos ? Math.min(Math.max(pos.x - tooltipWidth / 2, 8), window.innerWidth - tooltipWidth - 8) : 0;
 
   return (
     <span
       ref={ref}
-      className="relative inline-block"
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
+      className="inline-block"
+      onMouseEnter={() => setPos(calcTooltipPos(ref))}
+      onMouseLeave={() => setPos(null)}
     >
       <span className="border-b border-dotted border-zinc-500 text-zinc-200 cursor-help">
         {children || term}
       </span>
-      {show && definition && (
-        <span className={`absolute z-[100] left-1/2 -translate-x-1/2 w-60 px-3 py-2 rounded-lg shadow-xl
-          bg-zinc-800 border border-zinc-700 text-xs text-zinc-300 leading-relaxed pointer-events-none
-          ${pos === 'above' ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+      {pos && definition && (
+        <span
+          className="fixed z-[9999] w-60 px-3 py-2 rounded-lg shadow-xl bg-zinc-800 border border-zinc-700 text-xs text-zinc-300 leading-relaxed pointer-events-none"
+          style={{
+            left: safeLeft,
+            top: pos.y,
+            transform: pos.above ? 'translateY(-100%)' : 'none',
+          }}
+        >
           <span className="font-semibold text-zinc-100 block mb-0.5">{term}</span>
           {definition}
         </span>
