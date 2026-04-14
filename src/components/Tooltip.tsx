@@ -142,7 +142,7 @@ const JARGON: Record<string, string> = {
 
 type TooltipPos = { x: number; y: number; above: boolean } | null;
 
-function calcTooltipPos(ref: React.RefObject<HTMLSpanElement>): TooltipPos {
+function calcTooltipPos(ref: React.RefObject<HTMLSpanElement | null>): TooltipPos {
   if (!ref.current) return null;
   const rect = ref.current.getBoundingClientRect();
   const above = rect.top > 140;
