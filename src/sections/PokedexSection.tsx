@@ -47,12 +47,13 @@ export function PokedexSection() {
   const [inspectedMove, setInspectedMove] = useState<MoveData | null>(null);
   const [moveLoading, setMoveLoading] = useState(false);
 
-  // Ability tooltip
+  // Ability tooltip — fixed position to avoid overflow clipping
   const [abilityCache, setAbilityCache] = useState<Record<string, string>>({});
-  const [hoveredAbility, setHoveredAbility] = useState<string | null>(null);
+  const [abilityTooltip, setAbilityTooltip] = useState<{ name: string; x: number; y: number } | null>(null);
 
-  const handleAbilityHover = useCallback(async (name: string) => {
-    setHoveredAbility(name);
+  const handleAbilityEnter = useCallback(async (e: React.MouseEvent, name: string) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setAbilityTooltip({ name, x: rect.left, y: rect.top });
     if (abilityCache[name]) return;
     try {
       const data = await fetchAbility(name);
@@ -62,6 +63,8 @@ export function PokedexSection() {
       setAbilityCache(prev => ({ ...prev, [name]: "Aucune description disponible." }));
     }
   }, [abilityCache]);
+
+  const handleAbilityLeave = useCallback(() => setAbilityTooltip(null), []);
 
   // Favorites
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -252,23 +255,14 @@ export function PokedexSection() {
                         <p className="text-xs text-zinc-500 mb-1">Talents <span className="text-zinc-600">(survole pour voir l'effet)</span></p>
                         <div className="flex flex-wrap gap-1">
                           {pokemonData.abilities.map(a => (
-                            <div key={a.ability.name} className="relative">
-                              <span
-                                onMouseEnter={() => handleAbilityHover(a.ability.name)}
-                                onMouseLeave={() => setHoveredAbility(null)}
-                                className={`text-xs px-2 py-0.5 rounded cursor-help inline-block ${a.is_hidden ? 'bg-yellow-900/30 text-yellow-300 border border-yellow-800/50' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
-                              >
-                                {capitalize(a.ability.name)} {a.is_hidden ? "(HA)" : ""}
-                              </span>
-                              {hoveredAbility === a.ability.name && (
-                                <div className="absolute bottom-full left-0 mb-1.5 z-50 w-64 bg-zinc-800 border border-zinc-600 rounded-lg p-2.5 shadow-xl pointer-events-none">
-                                  <p className="text-xs font-semibold text-zinc-100 mb-1">{capitalize(a.ability.name)}</p>
-                                  <p className="text-xs text-zinc-300 leading-relaxed">
-                                    {abilityCache[a.ability.name] ?? "Chargement..."}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
+                            <span
+                              key={a.ability.name}
+                              onMouseEnter={e => handleAbilityEnter(e, a.ability.name)}
+                              onMouseLeave={handleAbilityLeave}
+                              className={`text-xs px-2 py-0.5 rounded cursor-help inline-block ${a.is_hidden ? 'bg-yellow-900/30 text-yellow-300 border border-yellow-800/50' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
+                            >
+                              {capitalize(a.ability.name)} {a.is_hidden ? "(HA)" : ""}
+                            </span>
                           ))}
                         </div>
                       </div>
@@ -805,6 +799,22 @@ export function PokedexSection() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Ability tooltip — fixed to viewport, never clipped */}
+      {abilityTooltip && (
+        <div
+          className="fixed z-[9999] w-64 bg-zinc-800 border border-zinc-600 rounded-lg p-2.5 shadow-xl pointer-events-none"
+          style={{
+            left: Math.min(abilityTooltip.x, window.innerWidth - 272),
+            top: abilityTooltip.y > 160 ? abilityTooltip.y - 8 - 80 : abilityTooltip.y + 28,
+          }}
+        >
+          <p className="text-xs font-semibold text-zinc-100 mb-1">{capitalize(abilityTooltip.name)}</p>
+          <p className="text-xs text-zinc-300 leading-relaxed">
+            {abilityCache[abilityTooltip.name] ?? "Chargement..."}
+          </p>
         </div>
       )}
     </div>
