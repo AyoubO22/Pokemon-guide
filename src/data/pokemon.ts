@@ -362,6 +362,204 @@ export const TOP_POKEMON: CompetitivePokemon[] = [
       { name: "Support (VGC)", item: "Wellspring Mask", ability: "Water Absorb", nature: "Jolly", evs: "252 HP / 4 Atk / 252 Spe", moves: ["Follow Me", "Spiky Shield", "Ivy Cudgel", "Horn Leech"], description: "Redirection clé avec Follow Me pour protéger ses alliés. Masque Puits lui donne un boost en Def Spéciale lors du Terastal.", format: "VGC" }
     ],
     notes: "Pression incroyable en VGC et OU. Son attaque signature Ivy Cudgel (Eau) fait de lourds dégâts et sa versatilité de redirection la rend très utile."
+  },
+  {
+    name: "Iron Valiant",
+    types: ["Fairy", "Fighting"],
+    baseStats: [74, 130, 90, 120, 60, 116],
+    tier: "OU (S tier Gen 9)",
+    role: ["Sweeper Mixte", "Wallbreaker", "Revenge Killer"],
+    keyAbilities: ["Quark Drive"],
+    keyMoves: ["Close Combat", "Moonblast", "Spirit Break", "Shadow Ball", "Swords Dance", "Calm Mind", "Encore"],
+    commonSets: [
+      { name: "Choice Scarf", item: "Choice Scarf", ability: "Quark Drive", nature: "Jolly", evs: "4 HP / 252 Atk / 252 Spe", moves: ["Close Combat", "Spirit Break", "Shadow Ball", "Encore"], description: "Revenge killer ultime. Quark Drive sous Electric Terrain booste sa vitesse déjà folle. Encore piège les setup moves adverses.", format: "Smogon OU" },
+      { name: "Swords Dance", item: "Booster Energy", ability: "Quark Drive", nature: "Jolly", evs: "4 HP / 252 Atk / 252 Spe", moves: ["Swords Dance", "Close Combat", "Spirit Break", "Shadow Ball"], description: "Booster Energy active Quark Drive sans terrain. À +2 et avec la couverture Fighting/Fairy/Ghost, très peu de choses survivent.", format: "Smogon OU" }
+    ],
+    notes: "Un des Pokémon les plus menaçants de Gen 9. Ses stats mixtes (130 Atk / 120 SpA / 116 Spe) lui permettent de jouer physique, spécial ou mixte. Fairy/Fighting est un typage offensif exceptionnel."
+  },
+  {
+    name: "Roaring Moon",
+    types: ["Dragon", "Dark"],
+    baseStats: [105, 139, 71, 55, 71, 119],
+    tier: "OU (S tier Gen 9)",
+    role: ["Setup Sweeper", "Wallbreaker", "Revenge Killer"],
+    keyAbilities: ["Protosynthesis"],
+    keyMoves: ["Acrobatics", "Dragon Dance", "Knock Off", "Earthquake", "Iron Head", "Crunch"],
+    commonSets: [
+      { name: "Dragon Dance", item: "Booster Energy", ability: "Protosynthesis", nature: "Jolly", evs: "4 HP / 252 Atk / 252 Spe", moves: ["Dragon Dance", "Acrobatics", "Knock Off", "Earthquake"], description: "Un des sweepers les plus redoutables. Booster Energy active Protosynthesis sur l'Attaque. DD+Acrobatics sans item dévaste. Dragon/Dark couvre tout.", format: "Smogon OU" }
+    ],
+    notes: "Roaring Moon est la contrepartie paradoxale de Salamence. 139 Atk et 119 Spe en font une menace de premier plan. Acrobatics sans item après Booster Energy atteint 110 de puissance STAB."
+  },
+  {
+    name: "Gliscor",
+    types: ["Ground", "Flying"],
+    baseStats: [75, 95, 125, 45, 75, 95],
+    tier: "OU (staple depuis Gen 4)",
+    role: ["Pivot Défensif", "Hazard Setter", "Stallbreaker"],
+    keyAbilities: ["Poison Heal"],
+    keyMoves: ["Earthquake", "U-turn", "Stealth Rock", "Toxic", "Protect", "Knock Off", "Facade"],
+    commonSets: [
+      { name: "Poison Heal Défensif", item: "Toxic Orb", ability: "Poison Heal", nature: "Impish", evs: "244 HP / 8 Atk / 236 Def / 20 Spe", moves: ["Earthquake", "U-turn", "Stealth Rock", "Knock Off"], description: "Toxic Orb s'active, Poison Heal soigne 12.5% par tour. Pratiquement impossible à poisonner ou brûler. Pivot défensif avec une régénération permanente.", format: "Smogon OU" }
+    ],
+    notes: "Gliscor est le stallbreaker et pivot défensif parfait. Son immunité aux statuts via Poison Heal, sa résistance aux hazards et sa capacité à utiliser U-turn en font un indispensable depuis des années."
+  },
+  {
+    name: "Ting-Lu",
+    types: ["Dark", "Ground"],
+    baseStats: [155, 110, 125, 55, 80, 45],
+    tier: "OU",
+    role: ["Hazard Setter", "Wall Physique", "Tank"],
+    keyAbilities: ["Vessel of Ruin"],
+    keyMoves: ["Stealth Rock", "Spikes", "Earthquake", "Ruination", "Whirlwind", "Knock Off"],
+    commonSets: [
+      { name: "Hazard Setter Défensif", item: "Leftovers", ability: "Vessel of Ruin", nature: "Impish", evs: "252 HP / 252 Def / 4 SpD", moves: ["Stealth Rock", "Spikes", "Earthquake", "Whirlwind"], description: "Vessel of Ruin réduit l'Atq.Spé de tous les adversaires présents de 25%. Bulk de 155/125 lui permet de poser les deux types de hazards et phazer avec Whirlwind.", format: "Smogon OU" }
+    ],
+    notes: "Le Pokémon avec le plus gros HP de Gen 9 (155). Vessel of Ruin affaiblit passif tous les attaquants spéciaux. Sa combinaison SR+Spikes en fait le meilleur setter de hazards du métagame Gen 9."
+  },
+  {
+    name: "Skeledirge",
+    types: ["Fire", "Ghost"],
+    baseStats: [104, 75, 100, 110, 75, 66],
+    tier: "OU",
+    role: ["Wall Offensif", "Stallbreaker", "Pivot"],
+    keyAbilities: ["Unaware"],
+    keyMoves: ["Torch Song", "Shadow Ball", "Slack Off", "Will-O-Wisp", "Hex", "Encore"],
+    commonSets: [
+      { name: "Unaware Wall", item: "Leftovers", ability: "Unaware", nature: "Bold", evs: "252 HP / 252 Def / 4 SpA", moves: ["Torch Song", "Slack Off", "Will-O-Wisp", "Shadow Ball"], description: "Unaware ignore les boosts adverses. Torch Song booste sa propre SpA à chaque coup. Le counter parfait des setup sweepers. Slack Off pour la régénération.", format: "Smogon OU" }
+    ],
+    notes: "Skeledirge est le counter de setup par excellence avec Unaware. Ses résistances Fire/Ghost lui permettent de bloquer de nombreuses menaces et de répondre avec Torch Song (boost +1 SpA garanti)."
+  },
+  {
+    name: "Darkrai",
+    types: ["Dark"],
+    baseStats: [70, 90, 90, 135, 90, 125],
+    tier: "OU",
+    role: ["Wallbreaker", "Sweeper Spécial", "Stallbreaker"],
+    keyAbilities: ["Bad Dreams"],
+    keyMoves: ["Dark Void", "Dark Pulse", "Sludge Bomb", "Nasty Plot", "Focus Blast", "Ice Beam"],
+    commonSets: [
+      { name: "Nasty Plot", item: "Life Orb", ability: "Bad Dreams", nature: "Timid", evs: "4 HP / 252 SpA / 252 Spe", moves: ["Dark Void", "Dark Pulse", "Sludge Bomb", "Nasty Plot"], description: "Dark Void à 80% endort un adversaire (Sleep Clause permet 1 max). NP booste SpA à +2. 135 SpA de base + Life Orb + NP = OHKO sur presque tout.", format: "Smogon OU" }
+    ],
+    notes: "Darkrai est une menace unique grâce à Dark Void (move signature à 80% de précision). Bad Dreams inflige 12.5% de dégâts par tour à la cible endormie. Combiné à NP, il peut sweeper des équipes entières."
+  },
+  {
+    name: "Kyurem",
+    types: ["Dragon", "Ice"],
+    baseStats: [125, 130, 90, 130, 90, 95],
+    tier: "OU",
+    role: ["Wallbreaker", "Setup Sweeper", "Breaker Mixte"],
+    keyAbilities: ["Pressure"],
+    keyMoves: ["Freeze-Dry", "Dragon Claw", "Earth Power", "Blizzard", "Substitute", "Roost"],
+    commonSets: [
+      { name: "SubRoost Spécial", item: "Leftovers", ability: "Pressure", nature: "Timid", evs: "4 HP / 252 SpA / 252 Spe", moves: ["Freeze-Dry", "Earth Power", "Dragon Claw", "Roost"], description: "Freeze-Dry est unique — super efficace contre l'Eau. 130 SpA avec 4 types de couverture. Roost pour durer. Quasi incounterarable sans un acier rapide.", format: "Smogon OU" }
+    ],
+    notes: "Kyurem est le wallbreaker le plus redouté de Gen 9 OU. Freeze-Dry super efficace contre l'Eau, Earth Power pour les Aciers, Dragon Claw pour les Dragons. 130/130 offensif avec 125 PV — aucun point faible."
+  },
+  {
+    name: "Meowscarada",
+    types: ["Grass", "Dark"],
+    baseStats: [76, 110, 70, 81, 70, 123],
+    tier: "OU",
+    role: ["Sweeper Physique", "Revenge Killer", "Wallbreaker"],
+    keyAbilities: ["Protean", "Overgrow"],
+    keyMoves: ["Flower Trick", "Knock Off", "U-turn", "Play Rough", "Sucker Punch", "Spikes"],
+    commonSets: [
+      { name: "Choice Band", item: "Choice Band", ability: "Protean", nature: "Jolly", evs: "4 HP / 252 Atk / 252 Spe", moves: ["Flower Trick", "Knock Off", "U-turn", "Play Rough"], description: "Flower Trick crite TOUJOURS et ignore les changements de stats/terrain. Avec CB et Protean, c'est STAB + 1.5x + crit. Knock Off et U-turn pour le momentum.", format: "Smogon OU" }
+    ],
+    notes: "La vitesse 123 en fait un des starters les plus rapides du jeu. Flower Trick est une attaque brisée — guaranteed crit ignore les Minimize, Cotton Guard, etc. Protean lui donne le STAB sur tous ses moves."
+  },
+  {
+    name: "Iron Moth",
+    types: ["Fire", "Poison"],
+    baseStats: [80, 70, 60, 140, 110, 110],
+    tier: "OU",
+    role: ["Sweeper Spécial", "Wallbreaker"],
+    keyAbilities: ["Quark Drive"],
+    keyMoves: ["Fiery Dance", "Sludge Wave", "Energy Ball", "Morning Sun", "Agility"],
+    commonSets: [
+      { name: "Booster Energy Offensif", item: "Booster Energy", ability: "Quark Drive", nature: "Timid", evs: "4 HP / 252 SpA / 252 Spe", moves: ["Fiery Dance", "Sludge Wave", "Energy Ball", "Morning Sun"], description: "Booster Energy booste SpA à 140+boost. Fiery Dance a 50% de chance de +1 SpA supplémentaire. Fire/Poison/Grass couvre énormément.", format: "Smogon OU" }
+    ],
+    notes: "La Volcarona paradoxale de Gen 9. 140 SpA est l'un des plus hauts du jeu. Fiery Dance peut snowball en accumulant des boosts. Résistance à 10 types incluant Fairy et Poison."
+  },
+  {
+    name: "Tornadus-Therian",
+    types: ["Flying"],
+    baseStats: [79, 100, 80, 110, 90, 121],
+    tier: "OU / VGC",
+    role: ["Pivot Offensif", "Stallbreaker", "Wallbreaker"],
+    keyAbilities: ["Regenerator"],
+    keyMoves: ["Hurricane", "Heat Wave", "Knock Off", "U-turn", "Nasty Plot", "Tailwind"],
+    commonSets: [
+      { name: "Pivot Regenerator", item: "Heavy-Duty Boots", ability: "Regenerator", nature: "Timid", evs: "4 HP / 252 SpA / 252 Spe", moves: ["Hurricane", "Heat Wave", "Knock Off", "U-turn"], description: "Regenerator + Boots = Pokémon qui ne meurt jamais. Hurricane en Pluie a 100% précision. U-turn pour le momentum sans perdre de PV. Un des pivots les plus efficaces.", format: "Smogon OU" },
+      { name: "Tailwind Support (VGC)", item: "Rocky Helmet", ability: "Regenerator", nature: "Timid", evs: "252 HP / 4 SpA / 252 Spe", moves: ["Tailwind", "Hurricane", "Heat Wave", "Knock Off"], description: "Speed control en VGC avec Tailwind. Regenerator le rend difficile à éliminer. Knock Off retire les items adverses.", format: "VGC" }
+    ],
+    notes: "Tornadus-T est l'un des meilleurs pivots du jeu depuis Gen 5. Regenerator + HDB le rend pratiquement impossible à chip. Hurricane à 30% confusion est parmi les attaques les plus dangereuses."
+  },
+  {
+    name: "Gouging Fire",
+    types: ["Fire", "Dragon"],
+    baseStats: [105, 115, 121, 65, 93, 91],
+    tier: "OU",
+    role: ["Wall Physique", "Setup Sweeper", "Pivot"],
+    keyAbilities: ["Protosynthesis"],
+    keyMoves: ["Dragon Dance", "Flare Blitz", "Outrage", "Earthquake", "Morning Sun", "Lava Plume"],
+    commonSets: [
+      { name: "Dragon Dance", item: "Booster Energy", ability: "Protosynthesis", nature: "Adamant", evs: "252 HP / 252 Atk / 4 Spe", moves: ["Dragon Dance", "Flare Blitz", "Outrage", "Earthquake"], description: "Tank qui setup. 105/121 lui permet d'absorber des coups avant de DD. Booster Energy active Protosynthesis sur l'Attaque. Fire/Dragon STAB dévastate après DD.", format: "Smogon OU" }
+    ],
+    notes: "Le paradoxe d'Entei avec le stats colossal de 105/121. Résistance clé au Feu et au Sol. Morning Sun lui permet de se soigner en dehors du Soleil. Menace entre wall et sweeper."
+  },
+  {
+    name: "Raging Bolt",
+    types: ["Electric", "Dragon"],
+    baseStats: [125, 73, 91, 137, 89, 75],
+    tier: "OU",
+    role: ["Wallbreaker Spécial", "Tank Offensif"],
+    keyAbilities: ["Protosynthesis"],
+    keyMoves: ["Thunderclap", "Dragon Pulse", "Thunderbolt", "Calm Mind", "Volt Switch", "Tera Blast"],
+    commonSets: [
+      { name: "Calm Mind", item: "Booster Energy", ability: "Protosynthesis", nature: "Modest", evs: "252 HP / 252 SpA / 4 SpD", moves: ["Thunderclap", "Dragon Pulse", "Calm Mind", "Volt Switch"], description: "Thunderclap est une attaque Électrique prioritaire +1. Avec CM, il devient un tank offensif redoutable. 137 SpA + Booster Energy + CM = quasi instopped.", format: "Smogon OU" }
+    ],
+    notes: "Raging Bolt a Thunderclap, l'unique attaque Électrique à priorité +1. Cela lui permet de revenge killer les sweepers rapides. 125 HP et 137 SpA pour un ratio offensif/défensif excellent."
+  },
+  {
+    name: "Calyrex-Shadow",
+    types: ["Psychic", "Ghost"],
+    baseStats: [100, 85, 80, 165, 100, 150],
+    tier: "Ubers / VGC Restricted",
+    role: ["Sweeper Spécial", "Revenge Killer", "Breaker"],
+    keyAbilities: ["As One (Spectrier)"],
+    keyMoves: ["Astral Barrage", "Shadow Ball", "Psyshock", "Nasty Plot", "Trick Room"],
+    commonSets: [
+      { name: "Sweeper Offensif (VGC)", item: "Choice Specs", ability: "As One", nature: "Timid", evs: "4 HP / 252 SpA / 252 Spe", moves: ["Astral Barrage", "Shadow Ball", "Psyshock", "Trick Room"], description: "165 SpA + 150 Vit + As One (booste SpA à chaque KO) = le Pokémon le plus dominant des formats Restricted. Astral Barrage (spread) dévaste les Doubles.", format: "VGC" }
+    ],
+    notes: "Calyrex-Shadow est considéré comme le Pokémon Restricted le plus puissant jamais créé. As One accumule des boosts de SpA à chaque KO. 165 SpA de base avec 150 de Vitesse — quasi impossible à outspeed et à stopper."
+  },
+  {
+    name: "Terapagos",
+    types: ["Normal"],
+    baseStats: [90, 65, 85, 65, 85, 60],
+    tier: "VGC (Regulation H+)",
+    role: ["Tank Spécial", "Setup", "Win Condition"],
+    keyAbilities: ["Tera Shift", "Teraform Zero"],
+    keyMoves: ["Tera Starstorm", "Earth Power", "Calm Mind", "Protect", "Dazzling Gleam"],
+    commonSets: [
+      { name: "Terastal Offensif (VGC)", item: "Leftovers", ability: "Tera Shift", nature: "Modest", evs: "252 HP / 252 SpA / 4 SpD", moves: ["Tera Starstorm", "Earth Power", "Calm Mind", "Protect"], description: "Devient Terapagos-Terastal au combat (95/105/110/105/110/85). Tera Starstorm est un spread move unique qui ignore Protect en Doubles. Teraform Zero annule la météo et les terrains.", format: "VGC" }
+    ],
+    notes: "La mascotte de Gen 9. Teraform Zero est un talent unique qui annule météo et terrain en devenant Stellar. Tera Starstorm ignore Protect en Doubles, ce qui en fait une menace incontournable en VGC Regulation H."
+  },
+  {
+    name: "Enamorus-Therian",
+    types: ["Fairy", "Flying"],
+    baseStats: [74, 115, 70, 135, 80, 106],
+    tier: "OU / VGC",
+    role: ["Sweeper Spécial", "Wallbreaker", "Support VGC"],
+    keyAbilities: ["Overcoat"],
+    keyMoves: ["Moonblast", "Heat Wave", "Earth Power", "Calm Mind", "Tailwind", "Follow Me"],
+    commonSets: [
+      { name: "Nasty Plot Offensif", item: "Life Orb", ability: "Overcoat", nature: "Timid", evs: "4 HP / 252 SpA / 252 Spe", moves: ["Moonblast", "Heat Wave", "Earth Power", "Calm Mind"], description: "135 SpA avec Fairy/Feu/Sol en couverture. Overcoat l'immunise aux poudres et grêle. Après CM, presque rien ne peut l'arrêter.", format: "Smogon OU" },
+      { name: "Support VGC", item: "Covert Cloak", ability: "Overcoat", nature: "Timid", evs: "252 HP / 4 SpA / 252 Spe", moves: ["Moonblast", "Heat Wave", "Tailwind", "Follow Me"], description: "Pose le Tailwind et redirige les attaques avec Follow Me. Covert Cloak ignore les effets secondaires des attaques adverses.", format: "VGC" }
+    ],
+    notes: "Enamorus-T combine des stats offensives de 115/135 avec un typage Fairy/Vol excellent. Overcoat la rend immunisée aux poudres (Spore, Sleep Powder) — un avantage clé contre Amoonguss en VGC."
   }
 ];
 
