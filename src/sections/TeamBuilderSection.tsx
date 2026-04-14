@@ -32,6 +32,56 @@ function toShowdownExport(team: (TeamMember | null)[]): string {
     .join('\n\n');
 }
 
+interface ShowdownEntry {
+  apiName: string;   // lowercase, dashes — for fetchPokemon
+  item?: string;
+  moves: string[];   // formatted ("Dragon Claw")
+}
+
+function parseShowdownText(text: string): ShowdownEntry[] {
+  const blocks = text.trim().split(/\n{2,}/);
+  const results: ShowdownEntry[] = [];
+
+  for (const block of blocks) {
+    const lines = block.trim().split('\n').map(l => l.trim()).filter(Boolean);
+    if (lines.length === 0) continue;
+
+    // Line 1: "Name (Nickname) @ Item" or "Name @ Item" or "Name"
+    let firstLine = lines[0];
+    // Strip gender markers
+    firstLine = firstLine.replace(/\s*\(M\)|\s*\(F\)/g, '').trim();
+
+    let displayName = firstLine;
+    let item: string | undefined;
+
+    if (firstLine.includes(' @ ')) {
+      const at = firstLine.indexOf(' @ ');
+      displayName = firstLine.slice(0, at).trim();
+      item = firstLine.slice(at + 3).trim();
+    }
+
+    // Strip nickname: "Nickname (Species)" → use Species
+    const nicknameMatch = displayName.match(/^.+\((.+)\)$/);
+    if (nicknameMatch) displayName = nicknameMatch[1].trim();
+
+    // Convert display name to PokéAPI name: "Iron Hands" → "iron-hands", "Charizard-Mega-X" → "charizard-mega-x"
+    const apiName = displayName.toLowerCase().replace(/\s+/g, '-');
+
+    const moves: string[] = [];
+    for (const line of lines.slice(1)) {
+      if (line.startsWith('- ')) {
+        const m = line.slice(2).trim();
+        if (m) moves.push(m);
+      }
+    }
+
+    if (apiName) results.push({ apiName, item, moves: moves.slice(0, 4) });
+    if (results.length >= 6) break;
+  }
+
+  return results;
+}
+
 // Type effectiveness for offense coverage
 const TYPE_EFFECTIVENESS: Record<string, string[]> = {
   Normal: [], Fire: ["Grass", "Ice", "Bug", "Steel"], Water: ["Fire", "Ground", "Rock"],
@@ -399,6 +449,40 @@ export function TeamBuilderSection() {
   const [copied, setCopied] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Import
+  const [showImport, setShowImport] = useState(false);
+  const [importText, setImportText] = useState('');
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState('');
+
+  const handleImport = async () => {
+    const entries = parseShowdownText(importText);
+    if (entries.length === 0) { setImportError('Aucun Pokémon détecté. Vérifie le format.'); return; }
+    setImporting(true);
+    setImportError('');
+    const newTeam: (TeamMember | null)[] = Array(6).fill(null);
+    const errors: string[] = [];
+    await Promise.all(
+      entries.map(async (entry, i) => {
+        try {
+          const pokemon = await fetchPokemon(entry.apiName);
+          const role = detectRole(pokemon);
+          newTeam[i] = { pokemon, role, item: entry.item || '', moves: [...entry.moves, '', '', '', ''].slice(0, 4) };
+        } catch {
+          errors.push(entry.apiName);
+        }
+      })
+    );
+    setTeam(newTeam);
+    setImporting(false);
+    if (errors.length) {
+      setImportError(`Pokémon introuvables : ${errors.join(', ')}`);
+    } else {
+      setShowImport(false);
+      setImportText('');
+    }
+  };
+
   // Saved teams
   const [savedTeams, setSavedTeams] = useState<SavedTeam[]>(loadSavedTeams);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -593,22 +677,30 @@ export function TeamBuilderSection() {
             les faiblesses collectives, et les rôles de chaque Pokémon pour optimiser votre stratégie.
           </p>
         </div>
-        {team.some(s => s) && (
-          <div className="flex gap-2 shrink-0">
-            <button
-              onClick={() => { setSaveTeamName(''); setShowSaveModal(true); }}
-              className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-2"
-            >
-              <span>💾</span> Sauvegarder
-            </button>
-            <button
-              onClick={() => setShowExport(true)}
-              className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-2"
-            >
-              <span>↗</span> Export Showdown
-            </button>
-          </div>
-        )}
+        <div className="flex gap-2 shrink-0 flex-wrap">
+          <button
+            onClick={() => { setImportText(''); setImportError(''); setShowImport(true); }}
+            className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-1.5"
+          >
+            <span>↙</span> Import Showdown
+          </button>
+          {team.some(s => s) && (
+            <>
+              <button
+                onClick={() => { setSaveTeamName(''); setShowSaveModal(true); }}
+                className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-1.5"
+              >
+                <span>💾</span> Sauvegarder
+              </button>
+              <button
+                onClick={() => setShowExport(true)}
+                className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-1.5"
+              >
+                <span>↗</span> Export Showdown
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Showdown Export Modal */}
@@ -633,6 +725,36 @@ export function TeamBuilderSection() {
                 className={`w-full py-2 rounded text-sm font-medium transition ${copied ? 'bg-green-700 text-white' : 'bg-red-600 hover:bg-red-500 text-white'}`}
               >
                 {copied ? '✓ Copié !' : 'Copier dans le presse-papier'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Import Showdown Modal */}
+      {showImport && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowImport(false)}>
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg w-full max-w-lg" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+              <h3 className="font-bold text-zinc-100">Importer depuis Pokémon Showdown</h3>
+              <button onClick={() => setShowImport(false)} className="text-zinc-500 hover:text-zinc-300 text-xl leading-none">×</button>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-xs text-zinc-500">Colle le texte d'une équipe exportée depuis Pokémon Showdown.</p>
+              <textarea
+                autoFocus
+                placeholder={"Garchomp @ Choice Scarf\nAbility: Rough Skin\n- Earthquake\n- Dragon Claw\n- Stone Edge\n- Swords Dance\n\nTyphlosion @ ..."}
+                value={importText}
+                onChange={e => { setImportText(e.target.value); setImportError(''); }}
+                className="w-full h-52 bg-zinc-950 border border-zinc-800 rounded p-3 text-sm font-mono text-zinc-200 placeholder-zinc-700 resize-none focus:outline-none focus:border-red-600"
+              />
+              {importError && <p className="text-xs text-red-400">{importError}</p>}
+              <button
+                onClick={handleImport}
+                disabled={importing || !importText.trim()}
+                className="w-full py-2 bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition"
+              >
+                {importing ? 'Chargement...' : 'Importer l\'équipe'}
               </button>
             </div>
           </div>
