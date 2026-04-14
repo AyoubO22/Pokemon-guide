@@ -1,6 +1,37 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { fetchPokemonList, fetchPokemon, capitalize, mapTypeName, type PokemonData, type PokemonListEntry } from '../data/pokeapi'
 import { TYPE_COLORS, TYPES, getDualTypeDefense } from '../data/types'
+
+function toShowdownName(name: string): string {
+  return name.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('-');
+}
+
+function toShowdownAbility(raw: string): string {
+  return raw.split('-').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+}
+
+function toShowdownExport(team: (TeamMember | null)[]): string {
+  return team
+    .filter((s): s is TeamMember => s !== null)
+    .map(slot => {
+      const p = slot.pokemon;
+      const name = toShowdownName(p.name);
+      const abilityRaw = p.abilities.find(a => !a.is_hidden)?.ability.name || p.abilities[0]?.ability.name || '';
+      const ability = abilityRaw ? toShowdownAbility(abilityRaw) : '';
+      return [
+        name,
+        ability ? `Ability: ${ability}` : '',
+        'Level: 100',
+        'EVs: 252 Atk / 4 SpD / 252 Spe',
+        'Jolly Nature',
+        '- ',
+        '- ',
+        '- ',
+        '- ',
+      ].filter(Boolean).join('\n');
+    })
+    .join('\n\n');
+}
 
 // Type effectiveness for offense coverage
 const TYPE_EFFECTIVENESS: Record<string, string[]> = {
@@ -183,6 +214,17 @@ export function TeamBuilderSection() {
   const [team, setTeam] = useState<(TeamMember | null)[]>(Array(6).fill(null));
   const [pokemonList, setPokemonList] = useState<PokemonListEntry[]>([]);
   const [showSearch, setShowSearch] = useState<number | null>(null);
+  const [showExport, setShowExport] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleCopy = () => {
+    const text = toShowdownExport(team);
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
   // Load full Pokémon list on mount
   useEffect(() => {
     const loadList = async () => {
@@ -296,13 +338,51 @@ export function TeamBuilderSection() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold mb-2">Constructeur d'Équipe</h2>
-        <p className="text-zinc-400 text-sm leading-relaxed max-w-3xl">
-          Construisez votre équipe compétitive et analysez sa synergie. Vérifiez la couverture de type,
-          les faiblesses collectives, et les rôles de chaque Pokémon pour optimiser votre stratégie.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold mb-2">Constructeur d'Équipe</h2>
+          <p className="text-zinc-400 text-sm leading-relaxed max-w-3xl">
+            Construisez votre équipe compétitive et analysez sa synergie. Vérifiez la couverture de type,
+            les faiblesses collectives, et les rôles de chaque Pokémon pour optimiser votre stratégie.
+          </p>
+        </div>
+        {team.some(s => s) && (
+          <button
+            onClick={() => setShowExport(true)}
+            className="shrink-0 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-2"
+          >
+            <span>↗</span> Export Showdown
+          </button>
+        )}
       </div>
+
+      {/* Showdown Export Modal */}
+      {showExport && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowExport(false)}>
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg w-full max-w-lg" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+              <h3 className="font-bold text-zinc-100">Export Pokémon Showdown</h3>
+              <button onClick={() => setShowExport(false)} className="text-zinc-500 hover:text-zinc-300 text-xl leading-none">×</button>
+            </div>
+            <div className="p-4 space-y-3">
+              <p className="text-xs text-zinc-500">Colle ce texte dans le Team Builder de Pokémon Showdown. Complète les moves, EVs et nature selon ton build.</p>
+              <textarea
+                ref={textareaRef}
+                readOnly
+                value={toShowdownExport(team)}
+                className="w-full h-64 bg-zinc-950 border border-zinc-800 rounded p-3 text-sm font-mono text-zinc-200 resize-none focus:outline-none"
+                onClick={e => (e.target as HTMLTextAreaElement).select()}
+              />
+              <button
+                onClick={handleCopy}
+                className={`w-full py-2 rounded text-sm font-medium transition ${copied ? 'bg-green-700 text-white' : 'bg-red-600 hover:bg-red-500 text-white'}`}
+              >
+                {copied ? '✓ Copié !' : 'Copier dans le presse-papier'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Team Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
