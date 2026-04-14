@@ -3,9 +3,9 @@ import { TOP_POKEMON, STAT_LABELS, STAT_COLORS } from '../data/pokemon'
 import { TYPE_COLORS, TYPES } from '../data/types'
 import {
   fetchPokemonList, fetchPokemon, fetchPokemonSpecies, fetchEvolutionChain,
-  fetchMove, capitalize, mapTypeName, mapStatName, mapDamageClass, getDamageClassColor,
-  getArtworkUrl, getFrenchName, getFrenchDescription, getFrenchGenus, getMoveFrenchFlavor,
-  flattenEvolution,
+  fetchMove, fetchAbility, getAbilityShortEffect, capitalize, mapTypeName, mapStatName,
+  mapDamageClass, getDamageClassColor, getArtworkUrl, getFrenchName, getFrenchDescription,
+  getFrenchGenus, getMoveFrenchFlavor, flattenEvolution,
   type PokemonData, type PokemonSpeciesData, type PokemonListEntry, type MoveData
 } from '../data/pokeapi'
 
@@ -46,6 +46,22 @@ export function PokedexSection() {
   const [error, setError] = useState("");
   const [inspectedMove, setInspectedMove] = useState<MoveData | null>(null);
   const [moveLoading, setMoveLoading] = useState(false);
+
+  // Ability tooltip
+  const [abilityCache, setAbilityCache] = useState<Record<string, string>>({});
+  const [hoveredAbility, setHoveredAbility] = useState<string | null>(null);
+
+  const handleAbilityHover = useCallback(async (name: string) => {
+    setHoveredAbility(name);
+    if (abilityCache[name]) return;
+    try {
+      const data = await fetchAbility(name);
+      const effect = getAbilityShortEffect(data);
+      setAbilityCache(prev => ({ ...prev, [name]: effect || "Aucune description disponible." }));
+    } catch {
+      setAbilityCache(prev => ({ ...prev, [name]: "Aucune description disponible." }));
+    }
+  }, [abilityCache]);
 
   // Favorites
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -233,13 +249,26 @@ export function PokedexSection() {
 
                       {/* Abilities */}
                       <div className="mb-3">
-                        <p className="text-xs text-zinc-500 mb-1">Talents</p>
+                        <p className="text-xs text-zinc-500 mb-1">Talents <span className="text-zinc-600">(survole pour voir l'effet)</span></p>
                         <div className="flex flex-wrap gap-1">
                           {pokemonData.abilities.map(a => (
-                            <span key={a.ability.name}
-                              className={`text-xs px-2 py-0.5 rounded ${a.is_hidden ? 'bg-yellow-900/30 text-yellow-300 border border-yellow-800/50' : 'bg-zinc-800 text-zinc-300'}`}>
-                              {capitalize(a.ability.name)} {a.is_hidden ? "(HA)" : ""}
-                            </span>
+                            <div key={a.ability.name} className="relative">
+                              <span
+                                onMouseEnter={() => handleAbilityHover(a.ability.name)}
+                                onMouseLeave={() => setHoveredAbility(null)}
+                                className={`text-xs px-2 py-0.5 rounded cursor-help inline-block ${a.is_hidden ? 'bg-yellow-900/30 text-yellow-300 border border-yellow-800/50' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
+                              >
+                                {capitalize(a.ability.name)} {a.is_hidden ? "(HA)" : ""}
+                              </span>
+                              {hoveredAbility === a.ability.name && (
+                                <div className="absolute bottom-full left-0 mb-1.5 z-50 w-64 bg-zinc-800 border border-zinc-600 rounded-lg p-2.5 shadow-xl pointer-events-none">
+                                  <p className="text-xs font-semibold text-zinc-100 mb-1">{capitalize(a.ability.name)}</p>
+                                  <p className="text-xs text-zinc-300 leading-relaxed">
+                                    {abilityCache[a.ability.name] ?? "Chargement..."}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
                           ))}
                         </div>
                       </div>

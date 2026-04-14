@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { TYPE_COLORS, TYPES } from '../data/types'
 import { TOP_POKEMON } from '../data/pokemon'
 import {
-  fetchMoveList, fetchMove, capitalize, mapTypeName, mapDamageClass, getDamageClassColor,
+  fetchMoveList, fetchMove, fetchAbilityList, fetchAbility, getAbilityShortEffect,
+  getAbilityFrenchFlavor, capitalize, mapTypeName, mapDamageClass, getDamageClassColor,
   mapTarget, mapAilment, getMoveFrenchFlavor, getMoveEnglishEffect,
-  type MoveData, type MoveListEntry
+  type MoveData, type MoveListEntry, type AbilityData, type AbilityListEntry
 } from '../data/pokeapi'
 
 // ── Competitive analysis helpers ────────────────────────────────────────────
@@ -173,6 +174,9 @@ function TypeBadge({ name }: { name: string }) {
 }
 
 export function MoveExplorerSection() {
+  const [activeTab, setActiveTab] = useState<'moves' | 'abilities'>('moves');
+
+  // ── Moves state ──
   const [allMoves, setAllMoves] = useState<MoveListEntry[]>([]);
   const [search, setSearch] = useState("");
   const [selectedMove, setSelectedMove] = useState("earthquake");
@@ -183,11 +187,28 @@ export function MoveExplorerSection() {
   const [showLearners, setShowLearners] = useState(false);
   const [visibleCount, setVisibleCount] = useState(30);
 
+  // ── Abilities state ──
+  const [allAbilities, setAllAbilities] = useState<AbilityListEntry[]>([]);
+  const [abilitySearch, setAbilitySearch] = useState("");
+  const [selectedAbility, setSelectedAbility] = useState("intimidate");
+  const [abilityData, setAbilityData] = useState<AbilityData | null>(null);
+  const [abilityLoading, setAbilityLoading] = useState(false);
+  const [abilityListLoading, setAbilityListLoading] = useState(true);
+  const [abilityError, setAbilityError] = useState("");
+  const [abilityVisibleCount, setAbilityVisibleCount] = useState(30);
+
   useEffect(() => {
     fetchMoveList(950).then(list => {
       setAllMoves(list);
       setListLoading(false);
     }).catch(() => setListLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetchAbilityList(307).then(list => {
+      setAllAbilities(list);
+      setAbilityListLoading(false);
+    }).catch(() => setAbilityListLoading(false));
   }, []);
 
   const loadMove = useCallback(async (name: string) => {
@@ -204,19 +225,44 @@ export function MoveExplorerSection() {
     setLoading(false);
   }, []);
 
+  const loadAbility = useCallback(async (name: string) => {
+    setAbilityLoading(true);
+    setAbilityError("");
+    try {
+      const data = await fetchAbility(name);
+      setAbilityData(data);
+    } catch {
+      setAbilityError("Talent non trouvé.");
+      setAbilityData(null);
+    }
+    setAbilityLoading(false);
+  }, []);
+
   useEffect(() => {
     if (selectedMove) loadMove(selectedMove);
   }, [selectedMove, loadMove]);
 
   useEffect(() => {
+    if (selectedAbility) loadAbility(selectedAbility);
+  }, [selectedAbility, loadAbility]);
+
+  useEffect(() => {
     setVisibleCount(30);
   }, [search]);
+
+  useEffect(() => {
+    setAbilityVisibleCount(30);
+  }, [abilitySearch]);
 
   const filteredList = allMoves.filter(m =>
     !search || m.name.includes(search.toLowerCase().replace(/ /g, "-"))
   );
-  
   const currentVisible = filteredList.slice(0, visibleCount);
+
+  const filteredAbilities = allAbilities.filter(a =>
+    !abilitySearch || a.name.includes(abilitySearch.toLowerCase().replace(/ /g, "-"))
+  );
+  const currentAbilities = filteredAbilities.slice(0, abilityVisibleCount);
 
   const frFlavor = moveData ? getMoveFrenchFlavor(moveData) : "";
   const enEffect = moveData ? getMoveEnglishEffect(moveData) : "";
@@ -233,13 +279,147 @@ export function MoveExplorerSection() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Explorateur de Moves</h2>
+        <h2 className="text-2xl font-bold mb-2">Explorateur de Moves & Talents</h2>
         <p className="text-zinc-400 text-sm leading-relaxed max-w-3xl">
-          Explore les <strong className="text-zinc-200">900+ moves</strong> du jeu via PokéAPI. Chaque move affiche son type,
-          sa puissance, catégorie, priorité, effets secondaires, et quels Pokémon l'apprennent.
+          Explore les <strong className="text-zinc-200">900+ moves</strong> et les <strong className="text-zinc-200">300+ talents</strong> du jeu via PokéAPI.
         </p>
       </div>
 
+      {/* Tab switcher */}
+      <div className="flex gap-2">
+        <button onClick={() => setActiveTab('moves')}
+          className={`px-4 py-1.5 text-sm rounded font-medium ${activeTab === 'moves' ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+          Moves
+        </button>
+        <button onClick={() => setActiveTab('abilities')}
+          className={`px-4 py-1.5 text-sm rounded font-medium ${activeTab === 'abilities' ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}>
+          Talents
+        </button>
+      </div>
+
+      {/* ── ABILITIES TAB ── */}
+      {activeTab === 'abilities' && (
+        <div className="grid md:grid-cols-[280px_1fr] gap-4">
+          {/* List */}
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+            <div className="p-2 border-b border-zinc-800">
+              <input
+                type="text"
+                placeholder="Nom du talent (anglais)..."
+                value={abilitySearch}
+                onChange={e => setAbilitySearch(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter" && abilitySearch) setSelectedAbility(abilitySearch.toLowerCase().replace(/ /g, "-")); }}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-1.5 text-sm"
+              />
+              <p className="text-[10px] text-zinc-600 mt-1">
+                {abilityListLoading ? "Chargement..." : `${allAbilities.length} talents · Entrée pour chercher`}
+              </p>
+            </div>
+            <div className="max-h-[550px] overflow-y-auto pb-2">
+              {currentAbilities.map(a => (
+                <button
+                  key={a.name}
+                  onClick={() => setSelectedAbility(a.name)}
+                  className={`w-full text-left px-3 py-2 border-b border-zinc-800/30 text-sm transition-colors
+                    ${selectedAbility === a.name ? 'bg-zinc-800 border-l-2 border-l-red-500' : 'hover:bg-zinc-800/50'}`}
+                >
+                  <span className="text-zinc-200">{capitalize(a.name)}</span>
+                </button>
+              ))}
+              {abilityVisibleCount < filteredAbilities.length && (
+                <button
+                  onClick={() => setAbilityVisibleCount(v => v + 30)}
+                  className="w-full text-center px-3 py-3 mt-1 text-xs text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50 transition-colors"
+                >
+                  Voir plus ({filteredAbilities.length - abilityVisibleCount} restants)
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Detail */}
+          <div className="space-y-4">
+            {abilityLoading && (
+              <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-8 text-center">
+                <div className="animate-pulse text-zinc-500">Chargement du talent...</div>
+              </div>
+            )}
+            {abilityError && (
+              <div className="bg-red-900/20 border border-red-800 rounded-lg p-4 text-red-400 text-sm">{abilityError}</div>
+            )}
+            {!abilityLoading && abilityData && (
+              <>
+                {/* Header */}
+                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-5">
+                  <div className="flex items-center gap-3 flex-wrap mb-3">
+                    <h3 className="text-xl font-bold text-zinc-100">{capitalize(abilityData.name)}</h3>
+                    <span className="text-xs text-zinc-500 ml-auto">
+                      #{abilityData.id} · {abilityData.generation.name.replace("generation-", "Gen ").toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* Effect */}
+                  <div className="bg-zinc-800/40 rounded-lg p-3 mb-3">
+                    <p className="text-[10px] text-zinc-500 uppercase font-medium mb-1">Effet</p>
+                    <p className="text-sm text-zinc-200 leading-relaxed">{getAbilityShortEffect(abilityData) || "—"}</p>
+                  </div>
+
+                  {/* French flavor */}
+                  {getAbilityFrenchFlavor(abilityData) && (
+                    <div className="bg-zinc-800/20 rounded p-2">
+                      <p className="text-xs text-zinc-400 italic">{getAbilityFrenchFlavor(abilityData)}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Competitive use from KEY_ABILITIES */}
+                {(() => {
+                  const topUser = TOP_POKEMON.filter(p =>
+                    p.keyAbilities.some(ka => ka.toLowerCase().replace(/ /g, "-") === abilityData.name)
+                  );
+                  return topUser.length > 0 ? (
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                      <h4 className="font-semibold text-zinc-200 mb-2 text-sm">Utilisateurs notables (Top Meta)</h4>
+                      <div className="flex flex-wrap gap-1.5">
+                        {topUser.map(p => (
+                          <span key={p.name} className="text-[11px] bg-red-900/30 text-red-300 border border-red-800/40 px-2 py-0.5 rounded">
+                            {p.name}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
+
+                {/* Pokémon with this ability */}
+                <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+                  <h4 className="font-semibold text-zinc-200 mb-3 text-sm">
+                    Pokémon avec ce talent
+                    <span className="text-xs text-zinc-500 font-normal ml-2">({abilityData.pokemon.length})</span>
+                  </h4>
+                  <div className="flex flex-wrap gap-1 max-h-[280px] overflow-y-auto">
+                    {abilityData.pokemon.map(p => (
+                      <span
+                        key={p.pokemon.name}
+                        className={`text-[11px] px-1.5 py-0.5 rounded cursor-default ${p.is_hidden ? 'bg-yellow-900/20 text-yellow-400 border border-yellow-800/30' : 'bg-zinc-800 text-zinc-400'}`}
+                        title={p.is_hidden ? "Talent caché (HA)" : ""}
+                      >
+                        {capitalize(p.pokemon.name)}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-zinc-600 mt-2">
+                    <span className="text-yellow-700">■</span> Talent caché (HA)
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── MOVES TAB ── */}
+      {activeTab === 'moves' && (
       <div className="grid md:grid-cols-[280px_1fr] gap-4">
         {/* Move list */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
@@ -520,6 +700,7 @@ export function MoveExplorerSection() {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }

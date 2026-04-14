@@ -153,6 +153,41 @@ export interface MoveListResponse {
   results: MoveListEntry[];
 }
 
+// ============ ABILITIES ============
+
+export interface AbilityData {
+  id: number;
+  name: string;
+  generation: { name: string };
+  effect_entries: { effect: string; short_effect: string; language: { name: string } }[];
+  flavor_text_entries: { flavor_text: string; language: { name: string }; version_group: { name: string } }[];
+  pokemon: { is_hidden: boolean; pokemon: { name: string } }[];
+}
+
+export interface AbilityListEntry {
+  name: string;
+  url: string;
+}
+
+export async function fetchAbility(nameOrId: string | number): Promise<AbilityData> {
+  return fetchCached<AbilityData>(`${API_BASE}/ability/${nameOrId}`);
+}
+
+export async function fetchAbilityList(limit = 307): Promise<AbilityListEntry[]> {
+  const data = await fetchCached<{ count: number; results: AbilityListEntry[] }>(`${API_BASE}/ability?limit=${limit}&offset=0`);
+  return data.results;
+}
+
+export function getAbilityShortEffect(ability: AbilityData): string {
+  const en = ability.effect_entries.find(e => e.language.name === "en");
+  return en?.short_effect || en?.effect || "";
+}
+
+export function getAbilityFrenchFlavor(ability: AbilityData): string {
+  const fr = ability.flavor_text_entries.filter(e => e.language.name === "fr");
+  return fr.length > 0 ? fr[fr.length - 1].flavor_text.replace(/\n/g, " ") : "";
+}
+
 // ============ FETCH FUNCTIONS ============
 
 export async function fetchPokemonList(limit = 1025): Promise<PokemonListEntry[]> {
