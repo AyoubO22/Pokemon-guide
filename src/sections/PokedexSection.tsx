@@ -219,10 +219,10 @@ export function PokedexSection() {
 
       {/* ============ API VIEW ============ */}
       {view === 'api' && (
-        <div className="grid md:grid-cols-[280px_1fr] gap-4">
+        <div className="grid md:grid-cols-[280px_1fr] gap-4 items-start">
           {/* Search & List */}
-          <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-            <div className="p-2 border-b border-zinc-800 space-y-1.5">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden flex flex-col sticky top-[110px] max-h-[calc(100vh-130px)]">
+            <div className="p-2 border-b border-zinc-800 space-y-1.5 shrink-0">
               <input
                 type="text"
                 placeholder="Nom FR/EN ou numéro..."
@@ -248,7 +248,7 @@ export function PokedexSection() {
                 </p>
               )}
             </div>
-            <div className="max-h-[calc(100vh-220px)] overflow-y-auto">
+            <div className="flex-1 min-h-0 overflow-y-auto">
               {filteredList.map(p => {
                 const id = p.url.split("/").filter(Boolean).pop();
                 return (
