@@ -44,18 +44,19 @@ const FONT_SIZE_MAP: Record<FontSize, string> = { sm: '14px', base: '16px', lg: 
 function App() {
   const [activeTab, setActiveTab] = useState("types");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [theme, setTheme] = useState<Theme>('dark');
-  const [fontSize, setFontSize] = useState<FontSize>('base');
+  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'dark');
+  const [fontSize, setFontSize] = useState<FontSize>(() => (localStorage.getItem('fontSize') as FontSize) || 'base');
   const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    // Fix overscroll showing white background
     document.body.className = theme === 'dark' ? 'bg-zinc-950 text-zinc-100' : 'bg-white text-zinc-900';
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   useEffect(() => {
     document.documentElement.style.fontSize = FONT_SIZE_MAP[fontSize];
+    localStorage.setItem('fontSize', fontSize);
   }, [fontSize]);
 
   const bgMain = theme === 'dark' ? 'bg-zinc-950 text-zinc-100' : 'bg-white text-zinc-900';
