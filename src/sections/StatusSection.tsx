@@ -28,7 +28,7 @@ export function StatusSection() {
               onClick={() => setExpanded(expanded === status.name ? null : status.name)}
             >
               <div className="p-4 flex items-start gap-3">
-                <span className="text-2xl">{status.icon}</span>
+                <span className="text-2xl" style={{ color: status.color }}>{status.icon}</span>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h4 className="font-semibold text-zinc-100">{status.nameFr}</h4>
