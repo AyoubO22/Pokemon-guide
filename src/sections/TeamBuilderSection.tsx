@@ -50,6 +50,23 @@ interface TeamMember {
   role?: string;
 }
 
+interface SavedTeam {
+  id: string;
+  name: string;
+  members: { pokemonName: string; role: string }[];
+  savedAt: number;
+}
+
+const LS_KEY = 'team_builder_saved_teams';
+
+function loadSavedTeams(): SavedTeam[] {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
+}
+
+function persistSavedTeams(teams: SavedTeam[]) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(teams)); } catch { /* ignore */ }
+}
+
 function TypeBadge({ name, small = false }: { name: string; small?: boolean }) {
   const color = TYPE_COLORS[name] || '#888';
   const frName = TYPES.find(t => t.name === name)?.nameFr || name;
@@ -218,6 +235,51 @@ export function TeamBuilderSection() {
   const [copied, setCopied] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Saved teams
+  const [savedTeams, setSavedTeams] = useState<SavedTeam[]>(loadSavedTeams);
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [saveTeamName, setSaveTeamName] = useState('');
+  const [loadingTeamId, setLoadingTeamId] = useState<string | null>(null);
+
+  const handleSaveTeam = () => {
+    const trimmed = saveTeamName.trim();
+    if (!trimmed) return;
+    const newEntry: SavedTeam = {
+      id: Date.now().toString(),
+      name: trimmed,
+      members: team
+        .filter((s): s is TeamMember => s !== null)
+        .map(s => ({ pokemonName: s.pokemon.name, role: s.role || '' })),
+      savedAt: Date.now(),
+    };
+    const updated = [newEntry, ...savedTeams];
+    setSavedTeams(updated);
+    persistSavedTeams(updated);
+    setSaveTeamName('');
+    setShowSaveModal(false);
+  };
+
+  const handleLoadTeam = async (saved: SavedTeam) => {
+    setLoadingTeamId(saved.id);
+    const newTeam: (TeamMember | null)[] = Array(6).fill(null);
+    await Promise.all(
+      saved.members.map(async (m, i) => {
+        try {
+          const pokemon = await fetchPokemon(m.pokemonName);
+          newTeam[i] = { pokemon, role: m.role };
+        } catch { /* skip */ }
+      })
+    );
+    setTeam(newTeam);
+    setLoadingTeamId(null);
+  };
+
+  const handleDeleteTeam = (id: string) => {
+    const updated = savedTeams.filter(t => t.id !== id);
+    setSavedTeams(updated);
+    persistSavedTeams(updated);
+  };
+
   const handleCopy = () => {
     const text = toShowdownExport(team);
     navigator.clipboard.writeText(text).then(() => {
@@ -347,12 +409,20 @@ export function TeamBuilderSection() {
           </p>
         </div>
         {team.some(s => s) && (
-          <button
-            onClick={() => setShowExport(true)}
-            className="shrink-0 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-2"
-          >
-            <span>↗</span> Export Showdown
-          </button>
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={() => { setSaveTeamName(''); setShowSaveModal(true); }}
+              className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-2"
+            >
+              <span>💾</span> Sauvegarder
+            </button>
+            <button
+              onClick={() => setShowExport(true)}
+              className="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded text-sm text-zinc-200 font-medium transition flex items-center gap-2"
+            >
+              <span>↗</span> Export Showdown
+            </button>
+          </div>
         )}
       </div>
 
@@ -380,6 +450,69 @@ export function TeamBuilderSection() {
                 {copied ? '✓ Copié !' : 'Copier dans le presse-papier'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Save Team Modal */}
+      {showSaveModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setShowSaveModal(false)}>
+          <div className="bg-zinc-900 border border-zinc-700 rounded-lg w-full max-w-sm" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+              <h3 className="font-bold text-zinc-100">Sauvegarder l'équipe</h3>
+              <button onClick={() => setShowSaveModal(false)} className="text-zinc-500 hover:text-zinc-300 text-xl leading-none">×</button>
+            </div>
+            <div className="p-4 space-y-3">
+              <input
+                type="text"
+                autoFocus
+                placeholder="Nom de l'équipe..."
+                value={saveTeamName}
+                onChange={e => setSaveTeamName(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleSaveTeam(); }}
+                className="w-full px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-white placeholder-zinc-500 focus:outline-none focus:border-red-600"
+              />
+              <button
+                onClick={handleSaveTeam}
+                disabled={!saveTeamName.trim()}
+                className="w-full py-2 bg-red-600 hover:bg-red-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded text-sm font-medium transition"
+              >
+                Sauvegarder
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Saved Teams */}
+      {savedTeams.length > 0 && (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+          <h3 className="text-sm font-bold text-zinc-300 mb-3">Mes équipes sauvegardées</h3>
+          <div className="space-y-2">
+            {savedTeams.map(saved => (
+              <div key={saved.id} className="flex items-center gap-3 bg-zinc-800/50 border border-zinc-700/50 rounded-lg px-3 py-2">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium text-zinc-200 truncate">{saved.name}</div>
+                  <div className="text-[11px] text-zinc-500 truncate">
+                    {saved.members.map(m => capitalize(m.pokemonName)).join(' · ')}
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleLoadTeam(saved)}
+                  disabled={loadingTeamId === saved.id}
+                  className="shrink-0 px-2.5 py-1 bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 text-zinc-200 rounded text-xs font-medium transition"
+                >
+                  {loadingTeamId === saved.id ? '...' : 'Charger'}
+                </button>
+                <button
+                  onClick={() => handleDeleteTeam(saved.id)}
+                  className="shrink-0 px-2 py-1 text-zinc-500 hover:text-red-400 rounded text-xs transition"
+                  title="Supprimer"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       )}
