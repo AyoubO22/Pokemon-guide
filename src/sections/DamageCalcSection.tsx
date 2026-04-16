@@ -95,18 +95,20 @@ function PokemonPicker({ label, selected, onSelect, pokemonList, isLoading }: Po
   const [search, setSearch] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [isLoadingPokemon, setIsLoadingPokemon] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   const filtered = pokemonList.filter(p => p.name.toLowerCase().includes(search.toLowerCase())).slice(0, 30);
 
   const handleSelect = async (entry: PokemonListEntry) => {
     setIsLoadingPokemon(true);
+    setFetchError(null);
     try {
       const data = await fetchPokemon(entry.name);
       onSelect(data);
       setSearch('');
       setShowDropdown(false);
-    } catch (err) {
-      console.error('Error fetching pokemon:', err);
+    } catch {
+      setFetchError('Impossible de charger ce Pokémon. Vérifie ta connexion.');
     } finally {
       setIsLoadingPokemon(false);
     }
@@ -144,6 +146,9 @@ function PokemonPicker({ label, selected, onSelect, pokemonList, isLoading }: Po
           </div>
         )}
       </div>
+      {fetchError && (
+        <p className="text-xs text-red-400 mt-1">{fetchError}</p>
+      )}
       {selected && (
         <div className="bg-zinc-800 rounded p-3 space-y-2">
           <div className="flex items-start gap-3">
