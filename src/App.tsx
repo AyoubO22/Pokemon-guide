@@ -69,18 +69,19 @@ function App() {
     <div className={`min-h-screen ${bgMain}`}>
       {/* Header */}
       <header className={`border-b ${bgHeader} backdrop-blur-sm sticky top-0 z-50`}>
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center gap-2 sm:gap-3">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-white font-bold text-sm shadow-lg shadow-red-900/30 shrink-0">P</div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center gap-3">
           <div className="flex-1 min-w-0">
-            <h1 className="text-sm sm:text-lg font-semibold tracking-tight truncate">Pokémon Compétitif — Encyclopédie</h1>
-            <p className={`text-[10px] sm:text-xs ${textMuted} hidden sm:block`}>Gen 1-9 · Singles & Doubles/VGC · 15 sections interactives</p>
+            <h1 className="text-base sm:text-xl font-bold tracking-tight leading-none truncate">
+              <span className="text-red-500">Pokémon</span>
+              <span className={`ml-2 font-medium ${textMuted}`}>Compétitif</span>
+            </h1>
           </div>
 
           {/* Settings button */}
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className={`p-1.5 sm:p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'} transition-colors`}
-            title="Paramètres"
+            className={`p-1.5 sm:p-2 rounded-md ${theme === 'dark' ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'} transition-colors`}
+            aria-label="Paramètres"
           >
             <span className="text-sm">⚙</span>
           </button>
@@ -88,7 +89,8 @@ function App() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className={`md:hidden p-1.5 rounded-lg ${theme === 'dark' ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'} transition-colors`}
+            className={`md:hidden p-1.5 rounded-md ${theme === 'dark' ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'} transition-colors`}
+            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >
             <span className="text-lg">{mobileMenuOpen ? '✕' : '☰'}</span>
           </button>
@@ -141,11 +143,10 @@ function App() {
               <TabsTrigger
                 key={item.id}
                 value={item.id}
-                className={`flex-shrink-0 px-2 lg:px-3 py-3 rounded-none border-b-2 border-transparent text-[12px] lg:text-[13px] font-medium
+                className={`flex-shrink-0 px-3 lg:px-4 py-3 rounded-none border-b-2 border-transparent text-[12px] lg:text-[13px] font-medium tracking-wide
                   data-[state=active]:border-red-500 data-[state=active]:text-zinc-100 data-[state=active]:bg-transparent
                   ${btnInactive} transition-colors bg-transparent`}
               >
-                <span className="mr-1 text-xs opacity-60">{item.icon}</span>
                 {item.label}
               </TabsTrigger>
             ))}
